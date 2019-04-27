@@ -1,46 +1,73 @@
 <程序> ::= <常量说明> <变量说明> <辅助1> <主函数>
+<program> ::= <const_Declare> <varible_Declare> <assist_1> <main_Func> 
 
 <常量说明> ::= const <常量定义> ; <常量说明> | ε
-
-<变量说明> ::= <声明头部> <辅助2> <辅助3> ; <变量说明> | ε
-
-<辅助1> ::= <有返回值函数定义> <辅助1> | <无返回值函数定义> <辅助1> | ε
-
-<主函数> ::= void main(){ <复合语句> }
+<const_Declare> ::= cont <const_Define> ; <const_Declare> | ε
 
 <常量定义> ::= int <标识符> = <整数> | char <标识符> = <字符> | , <常量定义> 
+<const_Define> ::= int <identity> = NUM | char <identity> = CHAR | , <const_Declare>
 
-<声明头部> ::= <类型标识符> <标识符>
+<变量说明> ::= <声明头部> <辅助2> <辅助3> ; <变量说明> | ε
+<varible_Declare> ::= <head_State> <assist_2> <assist_3> ; <varible_Declare> | ε
 
 <辅助2> ::= [ <无符号整数> ] | ε
+<assist_2> ::= [ NUM ] | ε
 
 <辅助3> ::= , <辅助2> <辅助3> | ε
+<assist_3> ::= , <assist_2> <assist_3> | ε
 
-<有返回值函数定义> ::= <声明头部> ( <参数表> ){ <复合语句> } | ε
-
-<无返回值函数定义> ::= void <标识符> ( <参数表> ){ <复合语句> }
-
-<复合语句> ::= <常量说明> <变量说明> <语句列>
-
-<类型标识符> ::= int | char
+<辅助1> ::= <有返回值函数定义> <辅助1> | <无返回值函数定义> <辅助1> | ε
+<assist_1> ::= <return_func_Declare> <assist_1> | <void_func_Declare> <assist_1> | ε
 
 <参数表> ::= <声明头部> <参数表> | ε
+<arg_List> ::= <head_State> <arg_List> | ε
+
+<复合语句> ::= <常量说明> <变量说明> <语句列>
+<compound_Sentence> ::= <const_Declare> <varible_Declare> <sentence_List>
+
+<声明头部> ::= <类型标识符> <标识符>
+<head_State> ::= <type_Iden> <identity>
 
 <语句列> ::= <语句> <语句列> | ε
+<sentence_List> ::= <sentence> <sentence_List> | ε
 
-<语句> ::= <条件语句> | <循环语句> | { <语句列> } | <函数调用语句> ; | <赋值语句> ; | scanf( <标识符> <辅助4> ); | printf( <辅助5> ); | ε ; | <情况语句> | return <辅助6> ;
+<语句> ::= <条件语句> | <循环语句> | { <语句列> } | <标识符> <辅助13> ; | scanf( <标识符> <辅助4> ); | printf( <辅助5> ); | ; | <情况语句> | return <辅助6> ;
+<sentence> ::= <if_Sentence> | <for_Sentence> | { <sentence_List> } | TAG <assist_13> ; | sanf( TAG <assist_4> ); | printf( <assist_5> ); | ; | <switch_Sentence> | return <assist_6> ; 
 
 <条件语句> ::= if( <条件> ) <语句> <辅助7>
+<if_Sentence> ::= if( <condition> ) <sentence> <assist_7>
 
 <循环语句> ::= for( <标识符> = <表达式> ; <条件> ; <标识符> = <标识符> <辅助8> <无符号整数> ) <语句>
+<for_Sentence> ::= for( TAG = <expression> ; <condition> ; TAG = TAG <assist_8> NUM ) <sentence>
 
-<赋值语句> ::= <标识符> = <表达式> | <标识符> [ <表达式> ]= <表达式>
+<情况语句> ::= switch( <表达式> ){ <情况表> <缺省> }
+<switch_Sentence> ::= switch( <expression> ){ <condition_List> <default_case> }
+
+<主函数> ::= void main(){ <复合语句> }
+<main_Func> ::= void main(){ <compound_Sentence> }
+
+<有返回值函数定义> ::= <声明头部> ( <参数表> ){ <复合语句> } | ε
+<return_func_Declare> ::= <head_State> ( <arg_List> ){ <compound_Sentence> } | ε
+
+<无返回值函数定义> ::= void <标识符> ( <参数表> ){ <复合语句> }
+<void_func_Declare> ::= void TAG ( <arg_List> ){ <compound_Sentence> }
+
+<类型标识符> ::= int | char
+<type_Iden> ::= int | char
+
+<辅助13> ::= <函数调用语句> | <赋值语句> 
+<assist_13> ::= <func_Call> | <assign_Sentence>
+
+<函数调用语句> ::= ( <值参数表> )
+<func_Call> ::= ( <value_argList> )
+
+<赋值语句> ::= = <表达式> | [ <表达式> ]= <表达式>
+<assign_Sentence> ::= = <expression> | [ <expression> ]= <expression>
 
 <辅助4> ::= , <标识符> <辅助4> | ε
 
 <辅助5> ::= <字符串> <辅助9> | <表达式>
 
-<情况语句> ::= switch( <表达式> ){ <情况表> <缺省> }
 
 <辅助6> ::= ( <表达式> ) | ε
 
@@ -75,8 +102,6 @@
 <常量> ::= <整数> | <字符>
 
 <乘法运算符> ::= * | /
-
-<函数调用语句> ::= <标识符> ( <值参数表> )
 
 <值参数表> ::= <表达式> <辅助12> | ε
 

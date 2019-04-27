@@ -11,11 +11,6 @@ TYPE s, iden;
 
 #define BUFFER_SIZE 100  //缓冲区大小
 
-//关键字定义
-
-
-
-
 FILE *fp;  //文件指针
 string now = "";  //处理文件名字与当前token
 char buffer[BUFFER_SIZE];  //缓冲区

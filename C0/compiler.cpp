@@ -21,16 +21,16 @@ int main(int argc,char *argv[]){
         file = "test.c";
     }
     cout << "词法分析结果：" << endl;
-    vector<pair<string, TYPE> > res1;
+    vector<pair<string, TYPE> > vec_tempFuncarg_1;
     word_initialize(file);
-    res1 = word_analyze();
+    vec_tempFuncarg_1 = word_analyze();
     cout << endl << "语法分析结果：" << endl;
-    vector<struct inter_code> res2;
-    grammar_initialize(res1);
-    res2 = grammar_analyze();
+    vector<struct inter_code> vec_tempFuncarg_2;
+    grammar_initialize(vec_tempFuncarg_1);
+    vec_tempFuncarg_2 = grammar_analyze();
     // system("pause");
     cout << endl << "语法制导翻译结果：" << endl;
-    translate_initialize(res2);
+    translate_initialize(vec_tempFuncarg_2);
     translate_process();
     // system("pause");
     return 0;
