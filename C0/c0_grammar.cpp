@@ -48,6 +48,15 @@ bool match_T(TYPE p, bool move){
     }
 }
 
+void assist_7(){
+    if(match_T(KW_ELSE, true)){
+        sentence();
+        return;
+    }
+    else{
+        return;
+    }
+}
 
 void if_Sentence(){
     if(match_T(KW_IF, true)){
@@ -61,6 +70,31 @@ void if_Sentence(){
         }
     }
     error("if_Sentence");
+}
+
+void assist_15(){
+    if(match_S("<", true) || match_S("<=", true) || match_S(">", true) || match_S(">=", true) || match_S("!=", true) || match_S("==", true)){
+        expression();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void condition(){
+    expression();
+    assist_15();
+    return;
+}
+
+void assist_8(){
+    if(match_S("+", true) || match_S("-", true)){
+        return;
+    }
+    else{
+        error("assist_8 none");
+    }
 }
 
 void for_Sentence(){
@@ -94,6 +128,45 @@ void for_Sentence(){
     error("for_Sentence");
 }
 
+void condition_kid(){
+    if(match_T(KW_CASE, true)){
+        if(match_T(NUM, true) || match_T(CHAR, true)){
+            if(match_S(":", true)){
+                sentence();
+                return;
+            }
+        }
+        error("condition_kid branch 1");
+    }
+    else{
+        error("condition_kid none");
+    }
+}
+
+void condition_List(){
+    if(match_T(KW_CASE, false)){
+        condition_kid();
+        condition_List();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void default_case(){
+    if(match_T(KW_DEFAULT, true)){
+        if(match_S(":", true)){
+            sentence();
+            return;
+        }
+        error("default_case branch 1");
+    }
+    else{
+        error("default_case none");
+    }
+}
+
 void switch_Sentence(){
     if(match_T(KW_SWITCH, true)){
         if(match_S("(", true)){
@@ -112,6 +185,28 @@ void switch_Sentence(){
     error("switch_Sentence");
 }
 
+void assist_12(){
+    if(match_S(",", true)){
+        expression();
+        assist_12();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void value_argList(){
+    if(match_S("+", false) || match_S("-", false) || match_T(TAG, false) || match_T(NUM, false) || match_T(CHAR, false) || match_S("(", false)){
+        expression();
+        assist_12();
+        return;        
+    }
+    else{
+        return;
+    }
+}
+
 void func_Call(){
     if(match_S("(", true)){
         value_argList();
@@ -120,6 +215,88 @@ void func_Call(){
         }
     }
     error("func_Call");
+}
+
+void assist_14(){
+    if(match_S("[", true)){
+        expression();
+        if(match_S("]", true)){
+            return;
+        }
+        error("assist_14");
+    }
+    if(match_S("(", false)){
+        func_Call();
+    }
+    else{
+        return;
+    }
+}
+
+void factor(){
+    if(match_T(TAG, true)){
+        assist_14();
+        return;
+    }
+    else if(match_T(NUM, true) || match_T(CHAR, true)){
+        return;
+    }
+    else if(match_S("(", true)){
+        expression();
+        if(match_S(")", true)){
+            return;
+        }
+        error("factor branch 1");
+    }
+    else{
+        error("factor none");
+    }
+}
+
+void assist_11(){
+    if(match_S("*", true) || match_S("/", true)){
+        item();
+        assist_11();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void item(){
+    factor();
+    assist_11();
+    return;
+}
+
+void assist_10(){
+    if(match_S("+", true) || match_S("-", true)){
+        item();
+        assist_10();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void expression(){
+    if(match_S("+", true)){
+        item();
+        assist_10();
+        return;
+    }
+    else if(match_S("-", true)){
+        item();
+        assist_10();
+        return;
+    }
+    else{
+        item();
+        assist_10();
+        return;
+    }
 }
 
 void assign_Sentence(){
@@ -153,6 +330,53 @@ void assist_13(){
     }
     else{
         error("assist_13");
+    }
+}
+
+void assist_4(){
+    if(match_S(",", true)){
+        if(match_T(TAG, true)){
+            assist_4();
+            return;
+        }
+        error("assist_4");
+    }
+    else{
+        return;
+    }
+}
+
+void assist_9(){
+    if(match_S(",", true)){
+        expression();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
+void assist_5(){
+    if(match_T(STR, true)){
+        assist_9();
+        return;
+    }
+    else{
+        expression();
+        return;
+    }
+}
+
+void assist_6(){
+    if(match_S("(", true)){
+        expression();
+        if(match_S(")", true)){
+            return;
+        }
+        error("assist_6");
+    }
+    else{
+        return;
     }
 }
 

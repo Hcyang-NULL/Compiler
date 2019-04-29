@@ -65,46 +65,70 @@
 <assign_Sentence> ::= = <expression> | [ <expression> ]= <expression>
 
 <辅助4> ::= , <标识符> <辅助4> | ε
+assist_4 ::= , TAG <assist_4 | ε
 
 <辅助5> ::= <字符串> <辅助9> | <表达式>
-
-
-<辅助6> ::= ( <表达式> ) | ε
-
-<条件> ::= <表达式> <关系运算符> <表达式> | <表达式>
-
-<辅助7> ::= else <语句> | ε
-
-<表达式> ::= + <项> <辅助10> | - <项> <辅助10> | <项> <辅助10>
-
-<辅助8> ::= + | -
+assist_5> ::= STR <assist_9> | <expression>
 
 <辅助9> ::= , <表达式> | ε
+<assist_9> ::= , <expression> | ε
 
-<情况表> ::= <情况子语句> <情况表> | ε
+<辅助6> ::= ( <表达式> ) | ε
+<assist_6> ::= ( <expression> ) | ε
 
-<缺省> ::= default: <语句>
-
-<关系运算符> ::= < | <= | > | >= | != | ==
+<表达式> ::= + <项> <辅助10> | - <项> <辅助10> | <项> <辅助10>
+<expression> ::= + <item> <assist_10> | - <item> <assist_10> | <item> <assist_10>
 
 <项> ::= <因子> <辅助11>
+<item> ::= <factor> <assist_11>
 
 <辅助10> ::= <加法运算符> <项> <辅助10> | ε
+<assist_10> ::= + <item> <assist_10> | - <item> <assist_10> | ε
 
-<情况子语句> ::= case <常量> : <语句>
-
-<因子> ::= <标识符> | <标识符> [ <表达式> ] | <整数> | <字符> | <函数调用语句> | ( <表达式> )
+<因子> ::= <标识符> <辅助14> | <整数> | <字符> | ( <表达式> )
+<factor> ::= TAG <assist_14> | NUM | CHAR | ( <expression> )
 
 <辅助11> ::= <乘法运算符> <因子> <辅助11> | ε
+<assist_11> ::= * <item> <assist_11> | / <item> <assist_11> | ε
+
+<辅助14> ::= [ <表达式> ] | <函数调用语句> |  ε
+<assist_14> ::= [ <expression> ] | <func_Call> |  ε
+
+<值参数表> ::= <表达式> <辅助12> | ε
+<value_argList> ::= <expression> <assist_12> | ε
+
+<辅助12> ::= , <表达式> <辅助12> | ε
+<assist_12> ::= , <expression> <assist_12> | ε
+
+<情况表> ::= <情况子语句> <情况表> | ε
+<condition_List> ::= <condition_kid> <condition_List> | ε
+
+<缺省> ::= default: <语句>
+<default_case> ::= default: <sentence>
+
+<情况子语句> ::= case <整数> : <语句> | case <字符> : <语句>
+<condition_kid> ::= case NUM : <sentence> | case CHAR : <sentence>
+
+<条件> ::= <表达式> <辅助15>
+<condition> ::= <expression> <assist_15>
+
+<辅助15> ::= <关系运算符> <表达式> | ε
+<assist_15> ::= 关系运算符 <expression> | ε
+
+<辅助7> ::= else <语句> | ε
+<assist_7> ::= else <sentence> | ε
+
+<辅助8> ::= + | -
+<assist_8> ::= + | -
+
+
+
+<关系运算符> ::= < | <= | > | >= | != | ==
 
 <加法运算符> ::= + | -
 
 <常量> ::= <整数> | <字符>
 
 <乘法运算符> ::= * | /
-
-<值参数表> ::= <表达式> <辅助12> | ε
-
-<辅助12> ::= , <表达式> <辅助12> | ε
 
 <整数> ::= 0 | + <无符号整数> | - <无符号整数> | <无符号整数>
