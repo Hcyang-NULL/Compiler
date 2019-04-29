@@ -12,16 +12,32 @@ vector<pair<string, TYPE> >::iterator g_iter_grammarTokens;
 pair<string, TYPE> g_currentToken;
 int g_errorNum = 0;
 
+void sentence();
+void condition();
+void expression();
+void item();
+void sentence_List();
+void const_Declare();
+void head_State();
+void assist_2();
+void varible_Declare();
+
 void error(string erro_type){
-    cout << erro_type << endl;
+    cout << "发生错误" << erro_type << endl;
     g_errorNum++;
     system("pause");
     exit(1);
 }
 
 void look(){
-    g_currentToken = g_vec_grammarTokens[0];
-    g_vec_grammarTokens.erase(g_iter_grammarTokens);
+    if(!g_vec_grammarTokens.empty()){
+        g_currentToken = g_vec_grammarTokens[0];
+        g_vec_grammarTokens.erase(g_iter_grammarTokens);
+        cout << "当前token：" << g_currentToken.first << " 类型：" << g_currentToken.second << endl;
+    }
+    else{
+        cout << "Token读取完成" << endl;
+    }
 }
 
 bool match_S(string p, bool move){
@@ -515,6 +531,15 @@ void return_func_Declare(){
     }
 }
 
+bool judge_main(){
+    if(g_vec_grammarTokens.size() >= 1){
+        if(g_vec_grammarTokens[0].first == "main"){
+            return true;
+        }
+    }
+    return false;
+}
+
 void assist_1(){
     if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
         return_func_Declare();
@@ -522,6 +547,9 @@ void assist_1(){
         return;
     }
     else if(match_T(KW_VOID, false)){
+        if(judge_main()){
+            return;
+        }
         void_func_Declare();
         assist_1();
         return;
@@ -662,9 +690,9 @@ void program(){
     return;
 }
 
-void grammar_analyze(){
+int grammar_analyze(){
     program();
-    return;
+    return g_errorNum;
 }
 
 void grammar_initialize(vector<pair<string, TYPE> > arg){

@@ -38,7 +38,6 @@ void scan(){
     else{
         c = buffer[p++];
     }
-    
 }
 
 /**
@@ -489,3 +488,16 @@ void word_initialize(string file){
     fp = fopen(file.c_str(),"r");
 }
 
+// int main(int argc, char *argv[]){
+//     string file = "";
+//     if(argc > 1){
+//         file = argv[1];
+//     }
+//     else{
+//         file = "C:\\Users\\HCY\\Desktop\\Compiler\\C0\\test.c";
+//     }
+//     cout << "词法分析结果：" << endl;
+//     vector<pair<string, TYPE> > vec_tempFuncarg_1;
+//     word_initialize(file);
+//     vec_tempFuncarg_1 = word_analyze();
+// }
