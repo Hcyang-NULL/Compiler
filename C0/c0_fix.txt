@@ -2,10 +2,16 @@
 <program> ::= <const_Declare> <varible_Declare> <assist_1> <main_Func> 
 
 <常量说明> ::= const <常量定义> ; <常量说明> | ε
-<const_Declare> ::= cont <const_Define> ; <const_Declare> | ε
+<const_Declare> ::= const <const_Define> ; <const_Declare> | ε
 
-<常量定义> ::= int <标识符> = <整数> | char <标识符> = <字符> | , <常量定义> 
-<const_Define> ::= int <identity> = NUM | char <identity> = CHAR | , <const_Declare>
+<常量定义> ::= int <辅助16> | char <辅助16> 
+<const_Define> ::= int TAG = NUM | char TAG = CHAR
+
+<辅助16> ::= <标识符> = <整数> <辅助17> | <标识符> = <字符> <辅助17>
+<assist_16> ::= TAG  = NUM <assist_17> | TAG  = CHAR <assist_17> 
+
+<辅助17> ::= , <辅助16> | ε
+<assist_17> ::= , <assist_16> | ε
 
 <变量说明> ::= <声明头部> <辅助2> <辅助3> ; <变量说明> | ε
 <varible_Declare> ::= <head_State> <assist_2> <assist_3> ; <varible_Declare> | ε

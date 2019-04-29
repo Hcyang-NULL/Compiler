@@ -21,6 +21,7 @@ void const_Declare();
 void head_State();
 void assist_2();
 void varible_Declare();
+void assist_16();
 
 void error(string erro_type){
     cout << "·¢Éú´íÎó" << erro_type << endl;
@@ -619,29 +620,32 @@ void varible_Declare(){
     }
 }
 
+void assist_17(){
+    if(match_S(",", true)){
+        assist_16();
+    }
+    else{
+        return;
+    }
+}
+
+void assist_16(){
+    if(match_T(TAG, true)){
+        if(match_S("=", true)){
+            if(match_T(NUM, true)){
+                assist_17();
+                return;
+            }
+        }
+    }
+}
+
 void const_Define(){
     if(match_T(KW_INT, true)){
-        if(match_T(TAG, true)){
-            if(match_S("=", true)){
-                if(match_T(NUM, true)){
-                    return;
-                }
-            }
-        }
-        error("const_Define branch 1");
+        assist_16();
     }
     else if(match_T(KW_CHAR, true)){
-        if(match_T(TAG, true)){
-            if(match_S("=", true)){
-                if(match_T(CHAR, true)){
-                    return;
-                }
-            }
-        }
-        error("const_Define branch 2");
-    }
-    else if(match_S(",", true)){
-        const_Declare();
+        assist_16();
     }
     else{
         error("const_Define none");
