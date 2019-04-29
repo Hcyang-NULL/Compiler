@@ -19,14 +19,17 @@
 <辅助2> ::= [ <无符号整数> ] | ε
 <assist_2> ::= [ NUM ] | ε
 
-<辅助3> ::= , <辅助2> <辅助3> | ε
-<assist_3> ::= , <assist_2> <assist_3> | ε
+<辅助3> ::= , TAG <辅助2> <辅助3> | ε
+<assist_3> ::= , TAG <assist_2> <assist_3> | ε
 
 <辅助1> ::= <有返回值函数定义> <辅助1> | <无返回值函数定义> <辅助1> | ε
 <assist_1> ::= <return_func_Declare> <assist_1> | <void_func_Declare> <assist_1> | ε
 
-<参数表> ::= <声明头部> <参数表> | ε
-<arg_List> ::= <head_State> <arg_List> | ε
+<参数表> ::= <声明头部> <辅助18> | ε
+<arg_List> ::= <head_State> <assist_18> | ε
+
+<辅助18> ::= , <参数表> | ε
+<assist_18> ::= , <arg_List> | ε
 
 <复合语句> ::= <常量说明> <变量说明> <语句列>
 <compound_Sentence> ::= <const_Declare> <varible_Declare> <sentence_List>

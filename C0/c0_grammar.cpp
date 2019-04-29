@@ -22,6 +22,7 @@ void head_State();
 void assist_2();
 void varible_Declare();
 void assist_16();
+void arg_List();
 
 void error(string erro_type){
     cout << "发生错误" << erro_type << endl;
@@ -482,10 +483,20 @@ void compound_Sentence(){
     return;
 }
 
+void assist_18(){
+    if(match_S(",", true)){
+        arg_List();
+        return;
+    }
+    else{
+        return;
+    }
+}
+
 void arg_List(){
     if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
         head_State();
-        arg_List();
+        assist_18();
         return;
     }
     else{
@@ -524,9 +535,11 @@ void return_func_Declare(){
                         return;
                     }
                 }
+
             }
+            error("函数定义缺失右括号");
         }
-        error("return_func_Declare");
+        error("函数定义缺失左括号");
     }
     else{
         return;
@@ -563,9 +576,12 @@ void assist_1(){
 
 void assist_3(){
     if(match_S(",", true)){
-        assist_2();
-        assist_3();
-        return;
+        if(match_T(TAG, true)){
+            assist_2();
+            assist_3();
+            return;
+        }
+        error("定义时缺失变量名字");
     }
     else{
         return;
@@ -605,16 +621,32 @@ void head_State(){
     }
 }
 
+bool LL2_func_variable(){
+    if(g_vec_grammarTokens.size() >= 2){
+        if(g_vec_grammarTokens[0].second == TAG){
+            if(g_vec_grammarTokens[1].first == "("){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void varible_Declare(){
     if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
-        head_State();
-        assist_2();
-        assist_3();
-        if(match_S(";", true)){
-            varible_Declare();
+        if(!LL2_func_variable()){
+            head_State();
+            assist_2();
+            assist_3();
+            if(match_S(";", true)){
+                varible_Declare();
+                return;
+            }
+            error("varible_Declare");
+        }
+        else{
             return;
         }
-        error("varible_Declare");
     }
     else{
         return;
