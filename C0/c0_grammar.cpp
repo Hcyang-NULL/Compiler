@@ -230,8 +230,9 @@ void func_Call(){
         if(match_S(")", true)){
             return;
         }
+        error("È±Ê§ÓÒÀ¨ºÅ");
     }
-    error("func_Call");
+    error("º¯ÊýÈ±Ê§×óÀ¨ºÅ");
 }
 
 void assist_14(){
@@ -420,7 +421,7 @@ void sentence(){
         }
         error("sentence branch 2");
     }
-    else if(match_S("scanf", true)){
+    else if(match_T(KW_SCANF, true)){
         if(match_S("(", true)){
             if(match_T(TAG, true)){
                 assist_4();
@@ -433,7 +434,7 @@ void sentence(){
         }
         error("sentence branch 3");
     }
-    else if(match_S("printf", true)){
+    else if(match_T(KW_PRINTF, true)){
         if(match_S("(", true)){
             assist_5();
             if(match_S(")", true)){

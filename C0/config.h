@@ -48,7 +48,9 @@ enum TYPE{
     KW_DEFAULT,   //¹Ø¼ü×Ö              
     KW_SIZEOF,    //¹Ø¼ü×Ö              
     KW_RETURN,    //¹Ø¼ü×Ö              
-    KW_IF,        //¹Ø¼ü×Ö          
+    KW_IF,        //¹Ø¼ü×Ö    
+    KW_PRINTF,    //¹Ø¼ü×Ö
+    KW_SCANF,     //¹Ø¼ü×Ö      
     END           //¹Ø¼ü×Ö         
 };
 

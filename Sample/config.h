@@ -49,6 +49,8 @@ enum TYPE{
     KW_SIZEOF,  
     KW_RETURN,  
     KW_IF,
+    KW_PRINTF,
+    KW_SCANF,
     END
 };
 

@@ -424,6 +424,12 @@ void add_token(){
                 else if(now == "if"){
                     iden = KW_IF;
                 }
+                else if(now == "printf"){
+                    iden = KW_PRINTF;
+                }
+                else if(now == "scanf"){
+                    iden = KW_SCANF;
+                }
                 else{
                     cout << "±êÊ¶·û" << endl;
                     break;
