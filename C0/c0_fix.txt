@@ -46,11 +46,11 @@
 <条件语句> ::= if( <条件> ) <语句> <辅助7>
 <if_Sentence> ::= if( <condition> ) <sentence> <assist_7>
 
-<循环语句> ::= for( <标识符> = <表达式> ; <条件> ; <标识符> = <标识符> <辅助8> <无符号整数> ) <语句>
-<for_Sentence> ::= for( TAG = <expression> ; <condition> ; TAG = TAG <assist_8> NUM ) <sentence>
+<循环语句> ::= while ( <条件> ) <语句>
+<for_Sentence> ::= while ( <条件> ) <语句>
 
-<情况语句> ::= switch( <表达式> ){ <情况表> <缺省> }
-<switch_Sentence> ::= switch( <expression> ){ <condition_List> <default_case> }
+<情况语句> ::= switch( <表达式> ){ <情况表> }
+<switch_Sentence> ::= switch( <expression> ){ <condition_List> }
 
 <主函数> ::= void main(){ <复合语句> }
 <main_Func> ::= void main(){ <compound_Sentence> }
@@ -111,9 +111,6 @@ assist_5> ::= STR <assist_9> | <expression>
 
 <情况表> ::= <情况子语句> <情况表> | ε
 <condition_List> ::= <condition_kid> <condition_List> | ε
-
-<缺省> ::= default: <语句>
-<default_case> ::= default: <sentence>
 
 <情况子语句> ::= case <整数> : <语句> | case <字符> : <语句>
 <condition_kid> ::= case NUM : <sentence> | case CHAR : <sentence>

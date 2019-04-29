@@ -106,44 +106,19 @@ void condition(){
     return;
 }
 
-void assist_8(){
-    if(match_S("+", true) || match_S("-", true)){
-        return;
-    }
-    else{
-        error("assist_8 none");
-    }
-}
-
 void for_Sentence(){
-    if(match_T(KW_FOR, true)){
+    if(match_T(KW_WHILE, true)){
         if(match_S("(", true)){
-            if(match_T(TAG, true)){
-                if(match_S("=", true)){
-                    expression();
-                    if(match_S(";", true)){
-                        condition();
-                        if(match_S(";", true)){
-                            if(match_T(TAG, true)){
-                                if(match_S("=", true)){
-                                    if(match_T(TAG, true)){
-                                        assist_8();
-                                        if(match_T(NUM, true)){
-                                            if(match_S(")", true)){
-                                                sentence();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            condition();
+            if(match_S(")", true)){
+                sentence();
+                return;
             }
+            error("WhileÑ­»·È±Ê§ÓÒÀ¨ºÅ");
         }
+        error("WhileÑ­»·È±Ê§Ìõ¼þ");
     }
-    error("for_Sentence");
+    error("Æ¥Åäwhile³ö´í");
 }
 
 void condition_kid(){
@@ -172,27 +147,13 @@ void condition_List(){
     }
 }
 
-void default_case(){
-    if(match_T(KW_DEFAULT, true)){
-        if(match_S(":", true)){
-            sentence();
-            return;
-        }
-        error("default_case branch 1");
-    }
-    else{
-        error("default_case none");
-    }
-}
-
 void switch_Sentence(){
     if(match_T(KW_SWITCH, true)){
         if(match_S("(", true)){
             expression();
             if(match_S(")", true)){
-                if(match_S("}", true)){
+                if(match_S("{", true)){
                     condition_List();
-                    default_case();
                     if(match_S("}", true)){
                         return;
                     }
@@ -404,7 +365,7 @@ void sentence(){
         if_Sentence();
         return;
     }
-    else if(match_T(KW_FOR, false)){
+    else if(match_T(KW_WHILE, false)){
         for_Sentence();
         return;
     }
@@ -466,7 +427,7 @@ void sentence(){
 }
 
 void sentence_List(){
-    if(match_T(KW_IF, false) || match_T(KW_FOR, false) || match_S("{", false) || match_T(TAG, false) || match_S("scanf", false) || match_S("printf", false) || match_S(";", false) || match_T(KW_SWITCH, false) || match_T(KW_RETURN, false)){
+    if(match_T(KW_IF, false) || match_T(KW_WHILE, false) || match_S("{", false) || match_T(TAG, false) || match_S("scanf", false) || match_S("printf", false) || match_S(";", false) || match_T(KW_SWITCH, false) || match_T(KW_RETURN, false)){
         sentence();
         sentence_List();
         return;    
