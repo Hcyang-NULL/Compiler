@@ -25,7 +25,7 @@ void assist_16();
 void arg_List();
 
 void error(string erro_type){
-    cout << "发生错误" << erro_type << endl;
+    cout << "Erro: " << erro_type << endl;
     g_errorNum++;
     system("pause");
     exit(1);
@@ -35,10 +35,10 @@ void look(){
     if(!g_vec_grammarTokens.empty()){
         g_currentToken = g_vec_grammarTokens[0];
         g_vec_grammarTokens.erase(g_iter_grammarTokens);
-        cout << "当前token：" << g_currentToken.first << " 类型：" << g_currentToken.second << endl;
+        cout << "Current Token：" << g_currentToken.first << " TYPE：" << g_currentToken.second << endl;
     }
     else{
-        cout << "Token读取完成" << endl;
+        cout << "No More Tokens !" << endl;
     }
 }
 
@@ -114,11 +114,11 @@ void for_Sentence(){
                 sentence();
                 return;
             }
-            error("While循环缺失右括号");
+            error("Missing right paren nearing while");
         }
-        error("While循环缺失条件");
+        error("Missing loop-condition");
     }
-    error("匹配while出错");
+    error("uncanny mistake in for_Sentence");
 }
 
 void condition_kid(){
@@ -192,9 +192,9 @@ void func_Call(){
         if(match_S(")", true)){
             return;
         }
-        error("缺失右括号");
+        error("Missing right paren nearing the calling of function");
     }
-    error("函数缺失左括号");
+    error("uncanny mistake in func_Call");
 }
 
 void assist_14(){
@@ -498,9 +498,9 @@ void return_func_Declare(){
                 }
 
             }
-            error("函数定义缺失右括号");
+            error("Missing right paren nearing the declaration of function");
         }
-        error("函数定义缺失左括号");
+        error("uncanny mistake in return_func_Declare");
     }
     else{
         return;
@@ -542,7 +542,7 @@ void assist_3(){
             assist_3();
             return;
         }
-        error("定义时缺失变量名字");
+        error("Missing name of variable");
     }
     else{
         return;
