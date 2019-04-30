@@ -23,10 +23,14 @@ class signal{
 };
 class symbol{
     public:
+        // name of symbol
         string s_name;
+        // 0:const 1:variable 2:function 3:parameters
         int i_type;
-        int i_Value;
+        // i_type==0: value of const i_type==2: 0:void 1:int
+        int i_value;
         int i_address;
+        // number of parameters or size of array
         int i_para;
 };
 class symbolTable{
@@ -35,6 +39,16 @@ class symbolTable{
         int i_topIndex;
         int i_totalProgram;
         vector<int> vec_programIndex;
+    public:
+        void insert_symbol(string name, int type, int value, int address, int para){
+            symbol sym_temp;
+            sym_temp.s_name = name;
+            sym_temp.i_type = type;
+            sym_temp.i_value = value;
+            sym_temp.i_address = address;
+            sym_temp.i_para = para;
+            vec_symbols.push_back(sym_temp);
+        }
 };
 
 symbolTable g_symbolTab;
