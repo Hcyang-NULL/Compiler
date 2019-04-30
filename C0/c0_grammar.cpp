@@ -12,6 +12,34 @@ vector<pair<string, TYPE> >::iterator g_iter_grammarTokens;
 pair<string, TYPE> g_currentToken;
 int g_errorNum = 0;
 
+//global handy variable
+int i_address;
+
+
+//symbol table define
+class signal{
+    public:
+
+};
+class symbol{
+    public:
+        string s_name;
+        int i_type;
+        int i_Value;
+        int i_address;
+        int i_para;
+};
+class symbolTable{
+    public:
+        vector<symbol> vec_symbols;
+        int i_topIndex;
+        int i_totalProgram;
+        vector<int> vec_programIndex;
+};
+
+symbolTable g_symbolTab;
+signal g_signal;
+
 void sentence();
 void condition();
 void expression();
@@ -23,6 +51,7 @@ void assist_2();
 void varible_Declare();
 void assist_16();
 void arg_List();
+void number();
 
 void error(string erro_type){
     cout << "Erro: " << erro_type << endl;
@@ -123,11 +152,15 @@ void for_Sentence(){
 
 void condition_kid(){
     if(match_T(KW_CASE, true)){
-        if(match_T(NUM, true) || match_T(CHAR, true)){
-            if(match_S(":", true)){
-                sentence();
-                return;
-            }
+        if(match_T(CHAR, true)){
+            ;
+        }
+        else{
+            number();
+        }
+        if(match_S(":", true)){
+            sentence();
+            return;
         }
         error("condition_kid branch 1");
     }
@@ -218,7 +251,11 @@ void factor(){
         assist_14();
         return;
     }
-    else if(match_T(NUM, true) || match_T(CHAR, true)){
+    else if(match_S("+", false) || match_S("-", false) || match_T(NUM, false)){
+        number();
+        return;
+    }
+    else if(match_T(CHAR, true)){
         return;
     }
     else if(match_S("(", true)){
@@ -623,13 +660,24 @@ void assist_17(){
     }
 }
 
+void number(){
+    if(match_S("+", true) || match_S("-", true)){
+        if(match_T(NUM, true)){
+            return;
+        }
+    }
+    else if(match_T(NUM, true)){
+        return;
+    }
+    error("match number");
+}
+
 void assist_16(){
     if(match_T(TAG, true)){
         if(match_S("=", true)){
-            if(match_T(NUM, true)){
-                assist_17();
-                return;
-            }
+            number();
+            assist_17();
+            return;
         }
     }
 }
