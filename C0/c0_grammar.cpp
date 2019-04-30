@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "config.h"
-
+#include "generate_Intercode.cpp"
 
 using namespace std;
 
@@ -19,7 +19,13 @@ int i_address;
 //symbol table define
 class signal{
     public:
-
+        string s_tagName;
+        TYPE ty_kwType;
+        string s_intOp1;
+        string s_intOp2;
+        string s_charOp1;
+        string s_charOp2;
+        bool b_isConst;
 };
 class symbol{
     public:
@@ -99,6 +105,20 @@ bool match_S(string p, bool move){
 
 bool match_T(TYPE p, bool move){
     if(g_currentToken.second == p){
+        if(p == TAG){
+            g_signal.s_tagName = g_currentToken.first;
+        }
+        else if(p == NUM){
+            g_signal.s_intOp2 = g_signal.s_intOp1;
+            g_signal.s_intOp1 = g_currentToken.first;
+        }
+        else if(p == CHAR){
+            g_signal.s_charOp2 = g_signal.s_charOp1;
+            g_signal.s_charOp1 = g_currentToken.first;
+        }
+        else if(p >= KW_AUTO && p <= KW_SCANF){
+            g_signal.ty_kwType = p;
+        }
         if(move){
             look();
         }
@@ -690,6 +710,14 @@ void assist_16(){
     if(match_T(TAG, true)){
         if(match_S("=", true)){
             number();
+            if(g_signal.b_isConst){
+                if(g_signal.ty_kwType == KW_INT){
+                    genMidcode("const","int", g_signal.s_intOp1, g_signal.s_tagName);
+                }
+                else if(g_signal.ty_kwType == KW_CHAR){
+                    genMidcode("const","char", g_signal.s_charOp1, g_signal.s_tagName);
+                }
+            }
             assist_17();
             return;
         }
@@ -697,11 +725,10 @@ void assist_16(){
 }
 
 void const_Define(){
-    if(match_T(KW_INT, true)){
+    if(match_T(KW_INT, true) || match_T(KW_CHAR, true)){
+        g_signal.b_isConst = true;
         assist_16();
-    }
-    else if(match_T(KW_CHAR, true)){
-        assist_16();
+        g_signal.b_isConst = false;
     }
     else{
         error("const_Define none");
@@ -758,4 +785,10 @@ int grammar_analyze(){
 void grammar_initialize(vector<pair<string, TYPE> > arg){
     g_vec_grammarTokens = arg;
     g_iter_grammarTokens = g_vec_grammarTokens.begin();
+    g_signal.s_tagName = "";
+    g_signal.b_isConst = false;
+    g_signal.s_intOp1 = "";
+    g_signal.s_intOp2 = "";
+    g_signal.s_charOp1 = "";
+    g_signal.s_charOp2 = "";
 }
