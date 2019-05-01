@@ -5,7 +5,7 @@
 <const_Declare> ::= const <const_Define> ; <const_Declare> | ε
 
 <常量定义> ::= int <辅助16> | char <辅助16> 
-<const_Define> ::= int TAG = NUM | char TAG = CHAR
+<const_Define> ::= int <assist_16> | char <assist_16>
 
 <辅助16> ::= <标识符> = <整数> <辅助17> | <标识符> = <字符> <辅助17>
 <assist_16> ::= TAG  = NUM <assist_17> | TAG  = CHAR <assist_17> 
