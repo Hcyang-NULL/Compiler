@@ -60,6 +60,7 @@ class symbolTable{
 symbolTable g_symbolTab;
 signal g_signal;
 int i_genVarCount = 1;
+int i_genLableCount = 1;
 
 void sentence();
 void condition();
@@ -87,6 +88,14 @@ string genVarName(){
     i_genVarCount++;
     string name = "$hcy_"+ss.str();
     g_signal.stk_opArg.push(name);
+    return name;
+}
+
+string genLableName(){
+    stringstream ss;
+    ss << i_genLableCount;
+    i_genLableCount++;
+    string name = "_LABLE_"+ss.str();
     return name;
 }
 
@@ -175,9 +184,15 @@ void if_Sentence(){
     if(match_T(KW_IF, true)){
         if(match_S("(", true)){
             condition();
+            string s_ifLable = genLableName();
+            genMidcode("jne", "", "", s_ifLable);
             if(match_S(")", true)){
                 sentence();
+                string s_elseLable = genLableName();
+                genMidcode("jmp", "", "", s_elseLable);
+                genMidcode("lab", "", "", s_ifLable);
                 assist_7();
+                genMidcode("lab", "", "", s_elseLable);
                 return;
             }
         }
@@ -186,11 +201,38 @@ void if_Sentence(){
 }
 
 void assist_15(){
-    if(match_S("<", true) || match_S("<=", true) || match_S(">", true) || match_S(">=", true) || match_S("!=", true) || match_S("==", true)){
+    if(match_S("<", true)){
         expression();
+        genMidcode("<", getSTK_Top(), getSTK_Top(), "");
+        return;
+    }
+    else if(match_S("<=", true)){
+        expression();
+        genMidcode("<=", getSTK_Top(), getSTK_Top(), "");
+        return;
+    }
+    else if(match_S(">", true)){
+        expression();
+        genMidcode(">", getSTK_Top(), getSTK_Top(), "");
+        return;
+    }
+    else if(match_S(">=", true)){
+        expression();
+        genMidcode(">=", getSTK_Top(), getSTK_Top(), "");
+        return;
+    }
+    else if(match_S("!=", true)){
+        expression();
+        genMidcode("!=", getSTK_Top(), getSTK_Top(), "");
+        return;
+    }
+    else if(match_S("==", true)){
+        expression();
+        genMidcode("==", getSTK_Top(), getSTK_Top(), "");
         return;
     }
     else{
+        genMidcode("!=", getSTK_Top(), "0", "");
         return;
     }
 }
@@ -266,6 +308,7 @@ void switch_Sentence(){
 void assist_12(){
     if(match_S(",", true)){
         expression();
+        genMidcode("cpara", "", "", getSTK_Top());
         assist_12();
         return;
     }
@@ -277,6 +320,7 @@ void assist_12(){
 void value_argList(){
     if(match_S("+", false) || match_S("-", false) || match_T(TAG, false) || match_T(NUM, false) || match_T(CHAR, false) || match_S("(", false)){
         expression();
+        genMidcode("cpara", "", "", getSTK_Top());
         assist_12();
         return;        
     }
