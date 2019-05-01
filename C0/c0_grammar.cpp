@@ -807,11 +807,13 @@ void const_Declare(){
 void main_Func(){
     if(match_T(KW_VOID, true)){
         if(match_S("main", true)){
+            genMidcode("func", "", "", "main");
             if(match_S("(", true)){
                 if(match_S(")", true)){
                     if(match_S("{", true)){
                         compound_Sentence();
                         if(match_S("}", true)){
+                            genMidcode("end", "", "", "main");
                             return;
                         }
                     }
