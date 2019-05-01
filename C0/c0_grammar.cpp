@@ -300,12 +300,18 @@ void assist_14(){
     if(match_S("[", true)){
         expression();
         if(match_S("]", true)){
+            string opArg_arrayIndex = getSTK_Top();
+            string opArg_arrayName = getSTK_Top();
+            genMidcode("aAss", opArg_arrayName, opArg_arrayIndex, genVarName());
             return;
         }
         error("assist_14");
     }
     if(match_S("(", false)){
         func_Call();
+        string opArg_funcName = getSTK_Top();
+        genMidcode("call", opArg_funcName, "", genVarName());
+        return;
     }
     else{
         return;
@@ -409,6 +415,9 @@ void expression(){
 void assign_Sentence(){
     if(match_S("=", true)){
         expression();
+        string opArg_varBeta = getSTK_Top();
+        string opArg_varAlpha = getSTK_Top();
+        genMidcode("=", opArg_varBeta, "", opArg_varAlpha);
         return;
     }
     else if(match_S("[", true)){
@@ -416,6 +425,10 @@ void assign_Sentence(){
         if(match_S("]", true)){
             if(match_S("=", true)){
                 expression();
+                string opArg_VarGama = getSTK_Top();
+                string opArg_VarBeta = getSTK_Top();
+                string opArg_VarAlpha = getSTK_Top();
+                genMidcode("[]=", opArg_VarGama, opArg_VarBeta, opArg_VarAlpha);
                 return;
             }
         }
@@ -429,6 +442,7 @@ void assign_Sentence(){
 void assist_13(){
     if(match_S("(", false)){
         func_Call();
+        genMidcode("call", getSTK_Top(), "", "");
         return;
     }
     else if(match_S("=", false) || match_S("[", false)){
