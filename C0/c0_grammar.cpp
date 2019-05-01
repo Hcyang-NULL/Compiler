@@ -110,11 +110,22 @@ bool match_T(TYPE p, bool move){
                 g_signal.s_tagName = g_currentToken.first;
             }
             else if(p == NUM || p == CHAR){
-                if(g_signal.b_isNeg){
-                    g_signal.stk_opArg.push("-"+g_currentToken.first);
+                int temp_value;
+                string temp_string;
+                if(p == CHAR){
+                    stringstream ss;
+                    temp_value = g_currentToken.first[0];
+                    ss << temp_value;
+                    temp_string = ss.str();
                 }
                 else{
-                    g_signal.stk_opArg.push(g_currentToken.first);
+                    temp_string = g_currentToken.first;
+                }
+                if(g_signal.b_isNeg){
+                    g_signal.stk_opArg.push("-"+temp_string);
+                }
+                else{
+                    g_signal.stk_opArg.push(temp_string);
                 }
             }
             else if(p >= KW_AUTO && p <= KW_SCANF){
