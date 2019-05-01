@@ -884,6 +884,12 @@ void program(){
 
 void g_test(){
     mid_out(); 
+    cout << g_signal.stk_opArg.size() << endl;
+    int size = g_signal.stk_opArg.size();
+    for(int i = 0; i < size; i++){
+        string temp = getSTK_Top();
+        cout << temp << endl;
+    }
 }
 
 int grammar_analyze(){
