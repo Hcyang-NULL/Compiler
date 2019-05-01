@@ -59,6 +59,7 @@ class symbolTable{
 
 symbolTable g_symbolTab;
 signal g_signal;
+int i_genVarCount = 1;
 
 void sentence();
 void condition();
@@ -78,6 +79,15 @@ void error(string erro_type){
     g_errorNum++;
     system("pause");
     exit(1);
+}
+
+string genVarName(){
+    stringstream ss;
+    ss << i_genVarCount;
+    i_genVarCount++;
+    string name = "$hcy_"+ss.str();
+    g_signal.stk_opArg.push(name);
+    return name;
 }
 
 void look(){
@@ -107,7 +117,7 @@ bool match_T(TYPE p, bool move){
     if(g_currentToken.second == p){
         if(move){
             if(p == TAG){
-                g_signal.s_tagName = g_currentToken.first;
+                g_signal.stk_opArg.push(g_currentToken.first);
             }
             else if(p == NUM || p == CHAR){
                 int temp_value;
@@ -344,8 +354,19 @@ void item(){
 }
 
 void assist_10(){
-    if(match_S("+", true) || match_S("-", true)){
+    if(match_S("+", true)){
         item();
+        string opArg_tempBeta = getSTK_Top();
+        string opArg_tempAlpha = getSTK_Top();
+        genMidcode("add", opArg_tempAlpha, opArg_tempBeta, genVarName());
+        assist_10();
+        return;
+    }
+    else if(match_S("-", true)){
+        item();
+        string opArg_tempBeta = getSTK_Top();
+        string opArg_tempAlpha = getSTK_Top();
+        genMidcode("sub", opArg_tempAlpha, opArg_tempBeta, genVarName());
         assist_10();
         return;
     }
@@ -362,6 +383,8 @@ void expression(){
     }
     else if(match_S("-", true)){
         item();
+        string opArg_temp = getSTK_Top();  //because genVarName will be excute firstly
+        genMidcode("sub", "0", opArg_temp, genVarName());
         assist_10();
         return;
     }
@@ -648,10 +671,12 @@ void assist_2(){
             if(match_S("]", true)){
                 //this is a declaration of array
                 if(g_signal.ty_kwType == KW_INT){
-                    genMidcode("inta", "", getSTK_Top(), g_signal.s_tagName);
+                    string opArg_arrayValue = getSTK_Top();
+                    genMidcode("inta", "", opArg_arrayValue, getSTK_Top());
                 }
                 else if(g_signal.ty_kwType == KW_CHAR){
-                    genMidcode("chara", "", getSTK_Top(), g_signal.s_tagName);
+                    string opArg_arrayValue = getSTK_Top();
+                    genMidcode("chara", "", opArg_arrayValue, getSTK_Top());
                 }
                 else{
                     error("the type of declaration is not supported");
@@ -664,10 +689,10 @@ void assist_2(){
     else{
         //this is a declaration of int or char
         if(g_signal.ty_kwType == KW_INT){
-            genMidcode("int", "", "", g_signal.s_tagName);
+            genMidcode("int", "", "", getSTK_Top());
         }
         else if(g_signal.ty_kwType == KW_CHAR){
-            genMidcode("char", "", "", g_signal.s_tagName);
+            genMidcode("char", "", "", getSTK_Top());
         }
         else{
             error("the type of declaration is not supported");
@@ -764,7 +789,8 @@ void assist_16(){
                 number();
                 if(g_signal.b_isConst){
                     if(g_signal.ty_kwType == KW_INT){
-                        genMidcode("const","int", getSTK_Top(), g_signal.s_tagName);
+                        string opArg_value = getSTK_Top();
+                        genMidcode("const","int", opArg_value, getSTK_Top());
                     }
                     else{
                         error("Not support assign a int value to char type");
@@ -776,7 +802,8 @@ void assist_16(){
             else if(match_T(CHAR, true)){
                 if(g_signal.b_isConst){
                     if(g_signal.ty_kwType == KW_CHAR){
-                        genMidcode("const","char", getSTK_Top(), g_signal.s_tagName);
+                        string opArg_value = getSTK_Top();
+                        genMidcode("const","char", opArg_value, getSTK_Top());
                     }
                     else{
                         error("Not support assign a char value to int type");
