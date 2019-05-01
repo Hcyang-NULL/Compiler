@@ -105,21 +105,21 @@ bool match_S(string p, bool move){
 
 bool match_T(TYPE p, bool move){
     if(g_currentToken.second == p){
-        if(p == TAG){
-            g_signal.s_tagName = g_currentToken.first;
-        }
-        else if(p == NUM || p == CHAR){
-            if(g_signal.b_isNeg){
-                g_signal.stk_opArg.push("-"+g_currentToken.first);
-            }
-            else{
-                g_signal.stk_opArg.push(g_currentToken.first);
-            }
-        }
-        else if(p >= KW_AUTO && p <= KW_SCANF){
-            g_signal.ty_kwType = p;
-        }
         if(move){
+            if(p == TAG){
+                g_signal.s_tagName = g_currentToken.first;
+            }
+            else if(p == NUM || p == CHAR){
+                if(g_signal.b_isNeg){
+                    g_signal.stk_opArg.push("-"+g_currentToken.first);
+                }
+                else{
+                    g_signal.stk_opArg.push(g_currentToken.first);
+                }
+            }
+            else if(p >= KW_AUTO && p <= KW_SCANF){
+                g_signal.ty_kwType = p;
+            }
             look();
         }
         return true;
@@ -635,12 +635,32 @@ void assist_2(){
     if(match_S("[", true)){
         if(match_T(NUM, true)){
             if(match_S("]", true)){
+                //this is a declaration of array
+                if(g_signal.ty_kwType == KW_INT){
+                    genMidcode("inta", "", getSTK_Top(), g_signal.s_tagName);
+                }
+                else if(g_signal.ty_kwType == KW_CHAR){
+                    genMidcode("chara", "", getSTK_Top(), g_signal.s_tagName);
+                }
+                else{
+                    error("the type of declaration is not supported");
+                }
                 return;
             }
         }
         error("assist_2");
     }
     else{
+        //this is a declaration of int or char
+        if(g_signal.ty_kwType == KW_INT){
+            genMidcode("int", "", "", g_signal.s_tagName);
+        }
+        else if(g_signal.ty_kwType == KW_CHAR){
+            genMidcode("char", "", "", g_signal.s_tagName);
+        }
+        else{
+            error("the type of declaration is not supported");
+        }
         return;
     }
 }
@@ -677,6 +697,7 @@ bool LL2_func_variable(){
 
 void varible_Declare(){
     if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
+        //not a function declaration
         if(!LL2_func_variable()){
             head_State();
             assist_2();
