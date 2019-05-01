@@ -22,3 +22,11 @@ void genMidcode(string operation, string alphaVar, string betaVar, string result
     mc_temp.s_result = result;
     g_vec_midcodes.push_back(mc_temp);
 }
+
+void mid_out(){
+    for(int i = 0; i < g_vec_midcodes.size(); i++){
+        midcode now = g_vec_midcodes[i];
+        cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", "
+        << now.s_betaVar << ", " << now.s_result << ">" << endl;
+    }
+}

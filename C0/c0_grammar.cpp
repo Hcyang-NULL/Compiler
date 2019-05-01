@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <stack>
 #include "config.h"
 #include "generate_Intercode.cpp"
 
@@ -21,11 +22,10 @@ class signal{
     public:
         string s_tagName;
         TYPE ty_kwType;
-        string s_intOp1;
-        string s_intOp2;
-        string s_charOp1;
-        string s_charOp2;
+        stack<string> stk_opArg;
         bool b_isConst;
+        bool b_isNeg;
+        int i_math;  //0:none 1:+ 2:- 3:* 4:/
 };
 class symbol{
     public:
@@ -108,13 +108,13 @@ bool match_T(TYPE p, bool move){
         if(p == TAG){
             g_signal.s_tagName = g_currentToken.first;
         }
-        else if(p == NUM){
-            g_signal.s_intOp2 = g_signal.s_intOp1;
-            g_signal.s_intOp1 = g_currentToken.first;
-        }
-        else if(p == CHAR){
-            g_signal.s_charOp2 = g_signal.s_charOp1;
-            g_signal.s_charOp1 = g_currentToken.first;
+        else if(p == NUM || p == CHAR){
+            if(g_signal.b_isNeg){
+                g_signal.stk_opArg.push("-"+g_currentToken.first);
+            }
+            else{
+                g_signal.stk_opArg.push(g_currentToken.first);
+            }
         }
         else if(p >= KW_AUTO && p <= KW_SCANF){
             g_signal.ty_kwType = p;
@@ -126,6 +126,17 @@ bool match_T(TYPE p, bool move){
     }
     else{
         return false;
+    }
+}
+
+string getSTK_Top(){
+    if(!g_signal.stk_opArg.empty()){
+        string temp = g_signal.stk_opArg.top();
+        g_signal.stk_opArg.pop();
+        return temp;
+    }
+    else{
+        error("Stack is empty");
     }
 }
 
@@ -695,10 +706,18 @@ void assist_17(){
 }
 
 void number(){
-    if(match_S("+", true) || match_S("-", true)){
+    if(match_S("+", true)){
         if(match_T(NUM, true)){
             return;
         }
+    }
+    else if(match_S("-", true)){
+        // recognize negtive number
+        g_signal.b_isNeg = true;
+        if(match_T(NUM, true)){
+            return;
+        }
+        g_signal.b_isNeg = false;
     }
     else if(match_T(NUM, true)){
         return;
@@ -709,17 +728,31 @@ void number(){
 void assist_16(){
     if(match_T(TAG, true)){
         if(match_S("=", true)){
-            number();
-            if(g_signal.b_isConst){
-                if(g_signal.ty_kwType == KW_INT){
-                    genMidcode("const","int", g_signal.s_intOp1, g_signal.s_tagName);
+            if(match_S("+", false) || match_S("-", false) || match_T(NUM, false)){
+                number();
+                if(g_signal.b_isConst){
+                    if(g_signal.ty_kwType == KW_INT){
+                        genMidcode("const","int", getSTK_Top(), g_signal.s_tagName);
+                    }
+                    else{
+                        error("Not support assign a int value to char type");
+                    }
                 }
-                else if(g_signal.ty_kwType == KW_CHAR){
-                    genMidcode("const","char", g_signal.s_charOp1, g_signal.s_tagName);
-                }
+                assist_17();
+                return;
             }
-            assist_17();
-            return;
+            else if(match_T(CHAR, true)){
+                if(g_signal.b_isConst){
+                    if(g_signal.ty_kwType == KW_CHAR){
+                        genMidcode("const","char", getSTK_Top(), g_signal.s_tagName);
+                    }
+                    else{
+                        error("Not support assign a char value to int type");
+                    }
+                }
+                assist_17();
+                return;
+            }
         }
     }
 }
@@ -777,6 +810,10 @@ void program(){
     return;
 }
 
+void g_test(){
+    mid_out(); 
+}
+
 int grammar_analyze(){
     program();
     return g_errorNum;
@@ -787,8 +824,8 @@ void grammar_initialize(vector<pair<string, TYPE> > arg){
     g_iter_grammarTokens = g_vec_grammarTokens.begin();
     g_signal.s_tagName = "";
     g_signal.b_isConst = false;
-    g_signal.s_intOp1 = "";
-    g_signal.s_intOp2 = "";
-    g_signal.s_charOp1 = "";
-    g_signal.s_charOp2 = "";
+    g_signal.b_isNeg = false;
+    while(!g_signal.stk_opArg.empty()){
+        g_signal.stk_opArg.pop();
+    }
 }

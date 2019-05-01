@@ -30,6 +30,10 @@ int main(int argc,char *argv[]){
     grammar_initialize(vec_tempFuncarg_1);
     g_tempError = grammar_analyze();
     cout << "Error number:" << g_tempError << endl;
+    if(g_tempError == 0){
+        cout << endl;
+        g_test();
+    }
     system("pause");
     // cout << endl << "语法制导翻译结果：" << endl;
     // translate_initialize(vec_tempFuncarg_2);
