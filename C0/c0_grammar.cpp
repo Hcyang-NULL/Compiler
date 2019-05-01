@@ -337,8 +337,19 @@ void factor(){
 }
 
 void assist_11(){
-    if(match_S("*", true) || match_S("/", true)){
-        item();
+    if(match_S("*", true)){
+        factor();
+        string opArg_tempBeta = getSTK_Top();
+        string opArg_tempAlpha = getSTK_Top();
+        genMidcode("mul", opArg_tempAlpha, opArg_tempBeta, genVarName());
+        assist_11();
+        return;
+    }
+    else if(match_S("/", true)){
+        factor();
+        string opArg_tempBeta = getSTK_Top();
+        string opArg_tempAlpha = getSTK_Top();
+        genMidcode("div", opArg_tempAlpha, opArg_tempBeta, genVarName());
         assist_11();
         return;
     }

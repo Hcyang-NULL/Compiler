@@ -98,7 +98,7 @@ assist_5> ::= STR <assist_9> | <expression>
 <factor> ::= TAG <assist_14> | NUM | CHAR | ( <expression> )
 
 <辅助11> ::= <乘法运算符> <因子> <辅助11> | ε
-<assist_11> ::= * <item> <assist_11> | / <item> <assist_11> | ε
+<assist_11> ::= * <factor> <assist_11> | / <factor> <assist_11> | ε
 
 <辅助14> ::= [ <表达式> ] | <函数调用语句> |  ε
 <assist_14> ::= [ <expression> ] | <func_Call> |  ε
