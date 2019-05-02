@@ -247,9 +247,15 @@ void condition(){
 void for_Sentence(){
     if(match_T(KW_WHILE, true)){
         if(match_S("(", true)){
+            string opArg_loopLableName = genLableName();
+            string opArg_outLableName = genLableName();
+            genMidcode("lab", "", "", opArg_loopLableName);
             condition();
             if(match_S(")", true)){
+                genMidcode("jne", "", "", opArg_outLableName);
                 sentence();
+                genMidcode("jmp", "", "", opArg_loopLableName);
+                genMidcode("lab", "", "", opArg_outLableName);
                 return;
             }
             error("Missing right paren nearing while");
