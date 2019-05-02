@@ -74,7 +74,7 @@
 <assign_Sentence> ::= = <expression> | [ <expression> ]= <expression>
 
 <辅助4> ::= , <标识符> <辅助4> | ε
-assist_4 ::= , TAG <assist_4 | ε
+assist_4 ::= , TAG <assist_4> | ε
 
 <辅助5> ::= <字符串> <辅助9> | <表达式>
 assist_5> ::= STR <assist_9> | <expression>
