@@ -8,11 +8,11 @@
 字符数组定义|char c[20]|&lt;chara, , 20, c&gt;
 整型变量定义|int a|&lt;int, , , a&gt;
 字符变量定义|char c|&lt;char, , , c&gt;
-表达式负运算|-10|&lt;sub, 0, 10, Var&gt;
-表达式加法运算|1 + 2|&lt;add, 1, 2, Var&gt;
-表达式减法运算|9 - 8|&lt;sub, 9, 8, Var&gt;
-表达式乘法运算|3 * 4|&lt;mul, 3, 4, Var&gt;
-表达式除法运算|7 / 6|&lt;div, 7, 6, Var&gt;
+表达式负运算|-10|&lt;-, 0, 10, Var&gt;
+表达式加法运算|1 + 2|&lt;+, 1, 2, Var&gt;
+表达式减法运算|9 - 8|&lt;-, 9, 8, Var&gt;
+表达式乘法运算|3 * 4|&lt;*, 3, 4, Var&gt;
+表达式除法运算|7 / 6|&lt;/, 7, 6, Var&gt;
 右值函数调用|a = handy()|&lt;call, handy, , Var&gt;
 右值数组调用|a = b[4]|&lt;aAss, b, 4, Var&gt;
 赋值语句|a = 1|&lt;=, a, , 1&gt;
@@ -24,7 +24,7 @@
 函数定义参数|void handy(int a)|&lt;para, int, , a&gt;
 函数定义参数|void handy(char c)|&lt;para, char, , c&gt;
 读语句|scanf(a)|&lt;scf, , int, a&gt;
-非主函数带参返回|return (expr)|&lt;ret, , , exsit_Var&gt;
+非主函数带参返回|return (expr)|&lt;ret, , , exist_Var&gt;
 非主函数无参返回|return;|&lt;ret, , , &gt;
 主函数返回|return|&lt;exit, , , &gt;
 有返回函数定义|int handy()|&lt;func, int, , handy&gt;
@@ -33,3 +33,8 @@
 函数结束|void handy(){}|&lt;end, , , handy&gt;
 if语句|if(condition){sentence}|&lt;较多略&gt;
 while语句|while(condition){sentence}|&lt;较多略&gt;
+
+## 符号说明：
+
+1. Var表示生成的变量（临时）
+2. exist_Var表示这个中间变量已经生成了
