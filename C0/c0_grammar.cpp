@@ -129,7 +129,7 @@ bool match_T(TYPE p, bool move){
             if(p == TAG){
                 g_signal.stk_opArg.push(g_currentToken.first);
             }
-            else if(p == NUM || p == CHAR){
+            else if(p == NUM || p == CHAR || p == STR){
                 int temp_value;
                 string temp_string;
                 if(p == CHAR){
@@ -506,6 +506,8 @@ void assist_13(){
 }
 
 void assist_4(){
+    // TODO: default type of input is int, because charator table is not constructed
+    genMidcode("scf", "", "int", getSTK_Top());
     if(match_S(",", true)){
         if(match_T(TAG, true)){
             assist_4();
@@ -518,23 +520,27 @@ void assist_4(){
     }
 }
 
-void assist_9(){
+string assist_9(){
     if(match_S(",", true)){
         expression();
-        return;
+        return getSTK_Top();
     }
     else{
-        return;
+        return "";
     }
 }
 
 void assist_5(){
+    // TODO: all type of printf is char, because the charactor table is not constructed now
     if(match_T(STR, true)){
-        assist_9();
+        string opArg_printfAplha = getSTK_Top();
+        string opArg_printfBeta = assist_9();
+        genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "char");
         return;
     }
     else{
         expression();
+        genMidcode("prtf", "", getSTK_Top(), "char");
         return;
     }
 }
@@ -996,8 +1002,14 @@ void program(){
 
 void g_test(){
     mid_out(); 
-    cout << g_signal.stk_opArg.size() << endl;
     int size = g_signal.stk_opArg.size();
+    cout << endl;
+    if(size == 0){
+        cout << ">> Analysis Successed" << endl;
+    }
+    else{
+        cout << ">> Analysis Failed..." << endl;
+    }
     for(int i = 0; i < size; i++){
         string temp = getSTK_Top();
         cout << temp << endl;
