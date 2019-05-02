@@ -35,9 +35,5 @@ int main(int argc,char *argv[]){
         g_test();
     }
     system("pause");
-    // cout << endl << "语法制导翻译结果：" << endl;
-    // translate_initialize(vec_tempFuncarg_2);
-    // translate_process();
-    // system("pause");
     return 0;
 }
