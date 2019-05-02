@@ -26,6 +26,7 @@ class signal{
         bool b_isConst;
         bool b_isNeg;
         int i_math;  //0:none 1:+ 2:- 3:* 4:/
+        bool b_isMain;
 };
 class symbol{
     public:
@@ -536,11 +537,23 @@ void assist_6(){
     if(match_S("(", true)){
         expression();
         if(match_S(")", true)){
+            if(g_signal.b_isMain){
+                genMidcode("exit", "", "", "");
+            }
+            else{
+                genMidcode("ret", "", "", getSTK_Top());
+            }
             return;
         }
         error("assist_6");
     }
     else{
+        if(g_signal.b_isMain){
+            genMidcode("exit", "", "", "");
+        }
+        else{
+            genMidcode("ret", "", "", "");
+        }
         return;
     }
 }
@@ -640,8 +653,15 @@ void assist_18(){
 }
 
 void arg_List(){
-    if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
+    if(match_T(KW_INT, false)){
         head_State();
+        genMidcode("para", "int", "", getSTK_Top());
+        assist_18();
+        return;
+    }
+    else if(match_T(KW_CHAR, false)){
+        head_State();
+        genMidcode("para", "char", "", getSTK_Top());
         assist_18();
         return;
     }
@@ -654,11 +674,15 @@ void void_func_Declare(){
     if(match_T(KW_VOID, true)){
         if(match_T(TAG, true)){
             if(match_S("(", true)){
+                string opArg_funcName = getSTK_Top();
+                genMidcode("func", "void", "", opArg_funcName);
                 arg_List();
                 if(match_S(")", true)){
                     if(match_S("{", true)){
                         compound_Sentence();
                         if(match_S("}", true)){
+                            genMidcode("ret", "", "", "");
+                            genMidcode("end", "", "", opArg_funcName);
                             return;
                         }
                     }
@@ -670,14 +694,17 @@ void void_func_Declare(){
 }
 
 void return_func_Declare(){
-    if(match_T(KW_INT, false) || match_T(KW_CHAR, false)){
+    if(match_T(KW_INT, false)){
         head_State();
         if(match_S("(", true)){
+            string opArg_funcName = getSTK_Top();
+            genMidcode("func", "int", "", opArg_funcName);
             arg_List();
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
                     if(match_S("}", true)){
+                        genMidcode("end", "", "", opArg_funcName);
                         return;
                     }
                 }
@@ -685,7 +712,27 @@ void return_func_Declare(){
             }
             error("Missing right paren nearing the declaration of function");
         }
-        error("uncanny mistake in return_func_Declare");
+        error("uncanny mistake in declaration of int function");
+    }
+    else if(match_T(KW_CHAR, false)){
+        head_State();
+        if(match_S("(", true)){
+            string opArg_funcName = getSTK_Top();
+            genMidcode("func", "char", "", opArg_funcName);
+            arg_List();
+            if(match_S(")", true)){
+                if(match_S("{", true)){
+                    compound_Sentence();
+                    if(match_S("}", true)){
+                        genMidcode("end", "", "", opArg_funcName);
+                        return;
+                    }
+                }
+
+            }
+            error("Missing right paren nearing the declaration of function");
+        }
+        error("uncanny mistake in declaration of char function");
     }
     else{
         return;
@@ -936,6 +983,7 @@ void program(){
     const_Declare();
     varible_Declare();
     assist_1();
+    g_signal.b_isMain = true;
     main_Func();
     return;
 }
@@ -961,6 +1009,7 @@ void grammar_initialize(vector<pair<string, TYPE> > arg){
     g_signal.s_tagName = "";
     g_signal.b_isConst = false;
     g_signal.b_isNeg = false;
+    g_signal.b_isMain = false;
     while(!g_signal.stk_opArg.empty()){
         g_signal.stk_opArg.pop();
     }
