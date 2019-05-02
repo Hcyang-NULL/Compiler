@@ -38,3 +38,17 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
 
 1. Var表示生成的变量（临时）
 2. exist_Var表示这个中间变量已经生成了
+
+## 语法支持
+
+暂不支持：
+
+1. switch语句
+2. 循环语句只支持while
+3. int，char之外的类型
+4. &，|，^，%，!操作
+5. 函数提前声明
+
+特性：
+
+1. 程序结构顺序：常量定义$\rightarrow$变量定义$\rightarrow$非主函数$\rightarrow$主函数
