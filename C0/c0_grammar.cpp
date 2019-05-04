@@ -17,6 +17,13 @@ int g_errorNum = 0;
 int g_address;
 int g_paranum;
 
+void error(string erro_type){
+    cout << "Erro: " << erro_type << endl;
+    g_errorNum++;
+    system("pause");
+    exit(1);
+}
+
 //symbol table define
 class signal{
     public:
@@ -45,23 +52,82 @@ class symbolTable{
         int i_totalProgram;
         vector<int> vec_programIndex;
     public:
+        void symbol_test(){
+            cout << "------- Symbol Table --------" << endl;
+            cout << "Total : " << i_topIndex << endl;
+            cout << "Total function : " << i_totalProgram << endl;
+            cout << "-----------------------------" << endl;
+            cout << "Global defination :" << endl;
+            for(int i = 0; i < vec_programIndex[0]; i++){
+                cout << vec_symbols[i].s_name;
+                switch(vec_symbols[i].i_type){
+                    case 0:{
+                        cout << " [type->Const" << " value->" << vec_symbols[i].i_value << "]";
+                        break;
+                    }
+                    case 1:cout << " [type->Variable]";break;
+                    case 2:cout << " [type->Error-funciton]";break;
+                    case 3:cout << " [type->Error-parameter]";break;
+                    default:cout << " [type->Error-none]";break;
+                }
+                cout << endl;
+            }
+            cout << "----------------------------" << endl;
+            for(int i = 0; i < i_totalProgram; i++){
+                int j = vec_programIndex[i];
+                int limit = -1;
+                if(i == i_totalProgram-1){
+                    limit = i_topIndex;
+                }
+                else{
+                    limit = vec_programIndex[i+1];
+                }
+                cout << "Function: " << vec_symbols[j].s_name;
+                if(vec_symbols[j].i_value == 0){
+                    cout << " type->void";
+                }
+                else if(vec_symbols[j].i_value == 1){
+                    cout << " type->int";
+                }
+                else{
+                    cout << " type->char";
+                }
+                cout << " para-num->" << vec_symbols[j].i_para << endl;
+                for(j++; j < limit; j++){
+                    cout << vec_symbols[j].s_name;
+                    switch(vec_symbols[j].i_type){
+                        case 0:cout << " [type->Erro-const]";break;
+                        case 1:cout << " [type->Variable]";break;
+                        case 2:cout << " [type->Error-funciton]";break;
+                        case 3:cout << " [type->parameter]";break;
+                        default:cout << " [type->Error-none]";break;
+                    }
+                    cout << endl;
+                }
+                cout << "----------------------------" << endl;
+            }
+        }
         void insert_symbol(string name, int type, int value, int address, int para){
             if(type == 2){
                 //insert a name of function
                 for(int i = 0; i < i_totalProgram; i++){
                     if(vec_symbols[vec_programIndex[i]].s_name == name){
-                        error("Multiply defination of function: "+name);
+                        error("Multiply defination of function");
                         return;
                     }
                 }
-                vec_programIndex[i_totalProgram++] = i_topIndex;
+                vec_programIndex.push_back(i_topIndex);
+                i_totalProgram++;
+                g_paranum = 0;
             }
             else{
                 //insert a name of variable
-                for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
-                    if(vec_symbols[i].s_name == name){
-                        error("Multiply defination of variable: "+name);
-                        return;
+                if(i_totalProgram != 0){
+                    for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
+                        if(vec_symbols[i].s_name == name){
+                            error("Multiply defination of variable");
+                            return;
+                        }
                     }
                 }
             }
@@ -69,6 +135,7 @@ class symbolTable{
             symbol sym_temp;
             sym_temp.s_name = name;
             sym_temp.i_type = type;
+            cout << "test-type = " << type << endl;
             sym_temp.i_value = value;
             sym_temp.i_address = address;
             sym_temp.i_para = para;
@@ -125,12 +192,7 @@ void assist_16();
 void arg_List();
 void number();
 
-void error(string erro_type){
-    cout << "Erro: " << erro_type << endl;
-    g_errorNum++;
-    system("pause");
-    exit(1);
-}
+
 
 string genVarName(){
     stringstream ss;
@@ -216,7 +278,16 @@ string getSTK_Top(){
         return temp;
     }
     else{
-        error("Stack is empty");
+        error("Get: stack is empty");
+    }
+}
+
+string requireSTK_Top(){
+    if(!g_signal.stk_opArg.empty()){
+        return g_signal.stk_opArg.top();
+    }
+    else{
+        error("Require: stack is empty");
     }
 }
 
@@ -716,13 +787,21 @@ void assist_18(){
 void arg_List(){
     if(match_T(KW_INT, false)){
         head_State();
-        genMidcode("para", "int", "", getSTK_Top());
+        g_paranum++;
+        string opArg_name = getSTK_Top();
+        g_address++;
+        g_symbolTab.insert_symbol(opArg_name, 3, -1, g_address, 0);
+        genMidcode("para", "int", "", opArg_name);
         assist_18();
         return;
     }
     else if(match_T(KW_CHAR, false)){
         head_State();
-        genMidcode("para", "char", "", getSTK_Top());
+        g_paranum++;
+        string opArg_name = getSTK_Top();
+        g_address++;
+        g_symbolTab.insert_symbol(opArg_name, 3, -1, g_address, 0);
+        genMidcode("para", "char", "", opArg_name);
         assist_18();
         return;
     }
@@ -736,8 +815,11 @@ void void_func_Declare(){
         if(match_T(TAG, true)){
             if(match_S("(", true)){
                 string opArg_funcName = getSTK_Top();
+                g_address = 0;
+                g_paranum = 0;
                 genMidcode("func", "void", "", opArg_funcName);
                 arg_List();
+                g_symbolTab.insert_symbol(opArg_funcName, 2, 0, g_address, g_paranum);
                 if(match_S(")", true)){
                     if(match_S("{", true)){
                         compound_Sentence();
@@ -759,8 +841,11 @@ void return_func_Declare(){
         head_State();
         if(match_S("(", true)){
             string opArg_funcName = getSTK_Top();
+            g_address = 0;
+            g_paranum = 0;
             genMidcode("func", "int", "", opArg_funcName);
             arg_List();
+            g_symbolTab.insert_symbol(opArg_funcName, 2, 1, g_address, g_paranum);
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
@@ -779,8 +864,11 @@ void return_func_Declare(){
         head_State();
         if(match_S("(", true)){
             string opArg_funcName = getSTK_Top();
+            g_address = 0;
+            g_paranum = 0;
             genMidcode("func", "char", "", opArg_funcName);
             arg_List();
+            g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g_address, g_paranum);
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
@@ -849,11 +937,23 @@ void assist_2(){
                 //this is a declaration of array
                 if(g_signal.ty_kwType == KW_INT){
                     string opArg_arrayValue = getSTK_Top();
-                    genMidcode("inta", "", opArg_arrayValue, getSTK_Top());
+                    string opArg_arrayName = getSTK_Top();
+                    //insert into symboltab
+                    int tempArray_size = atoi(opArg_arrayValue.c_str());
+                    g_address += tempArray_size;
+                    g_paranum = tempArray_size;
+                    g_symbolTab.insert_symbol(opArg_arrayName, 1, -1, g_address, g_paranum);
+                    genMidcode("inta", "", opArg_arrayValue, opArg_arrayName);
                 }
                 else if(g_signal.ty_kwType == KW_CHAR){
                     string opArg_arrayValue = getSTK_Top();
-                    genMidcode("chara", "", opArg_arrayValue, getSTK_Top());
+                    string opArg_arrayName = getSTK_Top();
+                    //insert into symboltab
+                    int tempArray_size = atoi(opArg_arrayValue.c_str());
+                    g_address += tempArray_size;
+                    g_paranum = tempArray_size;
+                    g_symbolTab.insert_symbol(opArg_arrayName, 1, -1, g_address, g_paranum);
+                    genMidcode("chara", "", opArg_arrayValue, opArg_arrayName);
                 }
                 else{
                     error("the type of declaration is not supported");
@@ -866,10 +966,18 @@ void assist_2(){
     else{
         //this is a declaration of int or char
         if(g_signal.ty_kwType == KW_INT){
-            genMidcode("int", "", "", getSTK_Top());
+            string opArg_name = getSTK_Top();
+            g_address++;
+            g_paranum = 0;
+            g_symbolTab.insert_symbol(opArg_name, 1, -1, g_address, g_paranum);
+            genMidcode("int", "", "", opArg_name);
         }
         else if(g_signal.ty_kwType == KW_CHAR){
-            genMidcode("char", "", "", getSTK_Top());
+            string opArg_name = getSTK_Top();
+            g_address++;
+            g_paranum = 0;
+            g_symbolTab.insert_symbol(opArg_name, 1, -1, g_address, g_paranum);
+            genMidcode("char", "", "", opArg_name);
         }
         else{
             error("the type of declaration is not supported");
@@ -967,7 +1075,13 @@ void assist_16(){
                 if(g_signal.b_isConst){
                     if(g_signal.ty_kwType == KW_INT){
                         string opArg_value = getSTK_Top();
-                        genMidcode("const","int", opArg_value, getSTK_Top());
+                        string opArg_name = getSTK_Top();
+                        //insert symbol
+                        g_address++;
+                        g_paranum = 0;
+                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g_address, g_paranum);
+                        //generate quaternary
+                        genMidcode("const","int", opArg_value, opArg_name);
                     }
                     else{
                         error("Not support assign a int value to char type");
@@ -980,7 +1094,12 @@ void assist_16(){
                 if(g_signal.b_isConst){
                     if(g_signal.ty_kwType == KW_CHAR){
                         string opArg_value = getSTK_Top();
-                        genMidcode("const","char", opArg_value, getSTK_Top());
+                        string opArg_name = getSTK_Top();
+                        //insert symbol
+                        g_address++;
+                        g_paranum = 0;
+                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g_address, g_paranum);
+                        genMidcode("const","char", opArg_value, opArg_name);
                     }
                     else{
                         error("Not support assign a char value to int type");
@@ -1022,6 +1141,9 @@ void const_Declare(){
 void main_Func(){
     if(match_T(KW_VOID, true)){
         if(match_S("main", true)){
+            g_address = 0;
+            g_paranum = 0;
+            g_symbolTab.insert_symbol("main", 2, -1, g_address, g_paranum);
             genMidcode("func", "", "", "main");
             if(match_S("(", true)){
                 if(match_S(")", true)){
@@ -1063,6 +1185,8 @@ void g_test(){
         string temp = getSTK_Top();
         cout << temp << endl;
     }
+    cout << endl;
+    g_symbolTab.symbol_test();
 }
 
 int grammar_analyze(){
