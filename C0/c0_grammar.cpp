@@ -61,15 +61,14 @@ class symbolTable{
             for(int i = 0; i < vec_programIndex[0]; i++){
                 cout << vec_symbols[i].s_name;
                 switch(vec_symbols[i].i_type){
-                    case 0:{
-                        cout << " [type->Const" << " value->" << vec_symbols[i].i_value << "]";
-                        break;
-                    }
-                    case 1:cout << " [type->Variable]";break;
-                    case 2:cout << " [type->Error-funciton]";break;
-                    case 3:cout << " [type->Error-parameter]";break;
-                    default:cout << " [type->Error-none]";break;
+                    case 0:cout << " [type->Const";break;
+                    case 1:cout << " [type->Variable";break;
+                    case 2:cout << " [type->Error-funciton";break;
+                    case 3:cout << " [type->Error-parameter";break;
+                    default:cout << " [type->Error-none";break;
                 }
+                symbol temp = vec_symbols[i];
+                cout << " value->" << temp.i_value << " address->" << temp.i_address << " para->" << temp.i_para << "]";
                 cout << endl;
             }
             cout << "----------------------------" << endl;
@@ -96,12 +95,14 @@ class symbolTable{
                 for(j++; j < limit; j++){
                     cout << vec_symbols[j].s_name;
                     switch(vec_symbols[j].i_type){
-                        case 0:cout << " [type->Erro-const]";break;
-                        case 1:cout << " [type->Variable]";break;
-                        case 2:cout << " [type->Error-funciton]";break;
-                        case 3:cout << " [type->parameter]";break;
-                        default:cout << " [type->Error-none]";break;
+                        case 0:cout << " [type->Erro-const";break;
+                        case 1:cout << " [type->Variable";break;
+                        case 2:cout << " [type->Error-funciton";break;
+                        case 3:cout << " [type->parameter";break;
+                        default:cout << " [type->Error-none";break;
                     }
+                    symbol temp = vec_symbols[j];
+                    cout << " value->" << temp.i_value << " address->" << temp.i_address << " para->" << temp.i_para << "]";
                     cout << endl;
                 }
                 cout << "----------------------------" << endl;
@@ -254,6 +255,7 @@ bool match_T(TYPE p, bool move){
                 }
                 if(g_signal.b_isNeg){
                     g_signal.stk_opArg.push("-"+temp_string);
+                    g_signal.b_isNeg = false;
                 }
                 else{
                     g_signal.stk_opArg.push(temp_string);
@@ -818,8 +820,8 @@ void void_func_Declare(){
                 g_address = 0;
                 g_paranum = 0;
                 genMidcode("func", "void", "", opArg_funcName);
-                arg_List();
                 g_symbolTab.insert_symbol(opArg_funcName, 2, 0, g_address, g_paranum);
+                arg_List();
                 if(match_S(")", true)){
                     if(match_S("{", true)){
                         compound_Sentence();
@@ -844,8 +846,8 @@ void return_func_Declare(){
             g_address = 0;
             g_paranum = 0;
             genMidcode("func", "int", "", opArg_funcName);
-            arg_List();
             g_symbolTab.insert_symbol(opArg_funcName, 2, 1, g_address, g_paranum);
+            arg_List();
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
