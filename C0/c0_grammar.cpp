@@ -20,12 +20,10 @@ int i_address;
 //symbol table define
 class signal{
     public:
-        string s_tagName;
         TYPE ty_kwType;
         stack<string> stk_opArg;
         bool b_isConst;
         bool b_isNeg;
-        int i_math;  //0:none 1:+ 2:- 3:* 4:/
         bool b_isMain;
 };
 class symbol{
@@ -1024,7 +1022,6 @@ int grammar_analyze(){
 void grammar_initialize(vector<pair<string, TYPE> > arg){
     g_vec_grammarTokens = arg;
     g_iter_grammarTokens = g_vec_grammarTokens.begin();
-    g_signal.s_tagName = "";
     g_signal.b_isConst = false;
     g_signal.b_isNeg = false;
     g_signal.b_isMain = false;
