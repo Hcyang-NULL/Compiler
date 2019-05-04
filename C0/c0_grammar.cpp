@@ -14,8 +14,8 @@ pair<string, TYPE> g_currentToken;
 int g_errorNum = 0;
 
 //global handy variable
-int i_address;
-
+int g_address;
+int g_paranum;
 
 //symbol table define
 class signal{
@@ -32,7 +32,7 @@ class symbol{
         string s_name;
         // 0:const 1:variable 2:function 3:parameters
         int i_type;
-        // i_type==0: value of const i_type==2: 0:void 1:int
+        // i_type==0: value of const i_type==2:function 0:void 1:int
         int i_value;
         int i_address;
         // number of parameters or size of array
@@ -46,13 +46,64 @@ class symbolTable{
         vector<int> vec_programIndex;
     public:
         void insert_symbol(string name, int type, int value, int address, int para){
+            if(type == 2){
+                //insert a name of function
+                for(int i = 0; i < i_totalProgram; i++){
+                    if(vec_symbols[vec_programIndex[i]].s_name == name){
+                        error("Multiply defination of function: "+name);
+                        return;
+                    }
+                }
+                vec_programIndex[i_totalProgram++] = i_topIndex;
+            }
+            else{
+                //insert a name of variable
+                for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
+                    if(vec_symbols[i].s_name == name){
+                        error("Multiply defination of variable: "+name);
+                        return;
+                    }
+                }
+            }
+            //real insert operation
             symbol sym_temp;
             sym_temp.s_name = name;
             sym_temp.i_type = type;
             sym_temp.i_value = value;
             sym_temp.i_address = address;
             sym_temp.i_para = para;
+            i_topIndex++;
             vec_symbols.push_back(sym_temp);
+        }
+        int searchSymbol(string name, int type){
+            if(type == 1){
+                //search a name of function
+                for(int i = 0; i < i_totalProgram; i++){
+                    if(vec_symbols[vec_programIndex[i]].s_name == name){
+                        if(vec_symbols[vec_programIndex[i]].i_para == g_paranum){
+                            return 1;
+                        }
+                        else{
+                            return 0;
+                        }
+                    }
+                }
+                return -1;
+            }
+            else{
+                //search a name of variable
+                for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
+                    if(vec_symbols[i].s_name == name){
+                        return 1;
+                    }
+                }
+                for(int i = 0; i < vec_programIndex[0]; i++){
+                    if(vec_symbols[i].s_name == name){
+                        return 1;
+                    }
+                }
+                return -1;
+            }
         }
 };
 
