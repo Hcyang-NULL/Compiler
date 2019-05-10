@@ -52,6 +52,7 @@ void globalConst(){
 void mips_start(){
     cout << ".data" << endl;
     globalConst();
+    
 }
 
 
