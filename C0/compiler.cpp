@@ -6,6 +6,7 @@
 #include "config.h"
 #include "Word_Analysis.cpp"
 #include "c0_grammar.cpp"
+#include "mips.cpp"
 
 using namespace std;
 
@@ -34,6 +35,9 @@ int main(int argc,char *argv[]){
         cout << endl;
         g_test();
     }
+    vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
+    mips_init(vec_tempFuncarg_2);
+    mips_start();
     system("pause");
     return 0;
 }
