@@ -30,3 +30,7 @@ void mid_out(){
         << now.s_betaVar << ", " << now.s_result << ">" << endl;
     }
 }
+
+vector<midcode> getVecMidcodes(){
+    return g_vec_midcodes;
+}
