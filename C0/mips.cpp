@@ -80,10 +80,17 @@ void globalVar(){
 }
 
 
-void mips_start(){
+void mips_init(){
     cout << ".data" << endl;
     globalConst();
     globalVar();
+}
+
+
+void mips_start(){
+    mips_init();
+
+    freopen("CON", "w", stdout);
 }
 
 
