@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "config.h"
 
 using namespace std;
 
@@ -49,10 +50,15 @@ void globalConst(){
 }
 
 
+void globalVar(){
+    
+}
+
+
 void mips_start(){
     cout << ".data" << endl;
     globalConst();
-    
+
 }
 
 

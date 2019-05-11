@@ -1,16 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "config.h"
 
 using namespace std;
 
-class midcode{
-    public:
-        string s_operation;
-        string s_alphaVar;
-        string s_betaVar;
-        string s_result;
-};
+
 
 vector<midcode> g_vec_midcodes;
 

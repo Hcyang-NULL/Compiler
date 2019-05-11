@@ -1,57 +1,57 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-
+#include <string>
 
 enum TYPE{
-    NONE,         //Î´ÖªÀàÐÍ
-    ERR,          //´íÎó
-    OK,           //µ¥¸öÊ¶±ðÍê³É
-    STR,          //×Ö·û´®
-    NUM,          //Êý×Ö
-    BOUND,        //½ç·û
-    PRE_HEX,      //ÁÙÊ±
-    HEX,          //Ê®Áù½øÖÆÊý×Ö
-    DEC,          //Ê®½øÖÆÊý×Ö
-    OCT,          //°Ë½øÖÆÊý×Ö
-    PRE_BIN,      //ÁÙÊ±
-    BIN,          //¶þ½øÖÆÊý×Ö
-    CHAR,         //×Ö·û
-    TAG,          //±êÊ¶·û
-    KW_AUTO,      //¹Ø¼ü×Ö
-    KW_SHORT,     //¹Ø¼ü×Ö            
-    KW_INT,       //¹Ø¼ü×Ö           
-    KW_LONG,      //¹Ø¼ü×Ö              
-    KW_FLOAT,     //¹Ø¼ü×Ö              
-    KW_DOUBLE,    //¹Ø¼ü×Ö              
-    KW_CHAR,      //¹Ø¼ü×Ö              
-    KW_STRUCT,    //¹Ø¼ü×Ö              
-    KW_UNION,     //¹Ø¼ü×Ö              
-    KW_ENUM,      //¹Ø¼ü×Ö              
-    KW_TYDEDEF,   //¹Ø¼ü×Ö              
-    KW_CONST,     //¹Ø¼ü×Ö              
-    KW_UNSIGNED,  //¹Ø¼ü×Ö              
-    KW_SIGNED,    //¹Ø¼ü×Ö              
-    KW_EXTERN,    //¹Ø¼ü×Ö              
-    KW_REGISTER,  //¹Ø¼ü×Ö              
-    KW_STATIC,    //¹Ø¼ü×Ö              
-    KW_VOLATILE,  //¹Ø¼ü×Ö              
-    KW_VOID,      //¹Ø¼ü×Ö              
-    KW_ELSE,      //¹Ø¼ü×Ö              
-    KW_SWITCH,    //¹Ø¼ü×Ö              
-    KW_CASE,      //¹Ø¼ü×Ö              
-    KW_FOR,       //¹Ø¼ü×Ö              
-    KW_DO,        //¹Ø¼ü×Ö              
-    KW_WHILE,     //¹Ø¼ü×Ö           
-    KW_GOTO,      //¹Ø¼ü×Ö              
-    KW_CONTINUE,  //¹Ø¼ü×Ö              
-    KW_BREAK,     //¹Ø¼ü×Ö              
-    KW_DEFAULT,   //¹Ø¼ü×Ö              
-    KW_SIZEOF,    //¹Ø¼ü×Ö              
-    KW_RETURN,    //¹Ø¼ü×Ö              
-    KW_IF,        //¹Ø¼ü×Ö    
-    KW_PRINTF,    //¹Ø¼ü×Ö
-    KW_SCANF,     //¹Ø¼ü×Ö      
-    END           //¹Ø¼ü×Ö         
+    NONE,         //Î´Öªï¿½ï¿½ï¿½ï¿½
+    ERR,          //ï¿½ï¿½ï¿½ï¿½
+    OK,           //ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½
+    STR,          //ï¿½Ö·ï¿½ï¿½ï¿½
+    NUM,          //ï¿½ï¿½ï¿½ï¿½
+    BOUND,        //ï¿½ï¿½ï¿½
+    PRE_HEX,      //ï¿½ï¿½Ê±
+    HEX,          //Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    DEC,          //Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    OCT,          //ï¿½Ë½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    PRE_BIN,      //ï¿½ï¿½Ê±
+    BIN,          //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    CHAR,         //ï¿½Ö·ï¿½
+    TAG,          //ï¿½ï¿½Ê¶ï¿½ï¿½
+    KW_AUTO,      //ï¿½Ø¼ï¿½ï¿½ï¿½
+    KW_SHORT,     //ï¿½Ø¼ï¿½ï¿½ï¿½            
+    KW_INT,       //ï¿½Ø¼ï¿½ï¿½ï¿½           
+    KW_LONG,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_FLOAT,     //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_DOUBLE,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_CHAR,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_STRUCT,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_UNION,     //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_ENUM,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_TYDEDEF,   //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_CONST,     //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_UNSIGNED,  //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_SIGNED,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_EXTERN,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_REGISTER,  //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_STATIC,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_VOLATILE,  //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_VOID,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_ELSE,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_SWITCH,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_CASE,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_FOR,       //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_DO,        //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_WHILE,     //ï¿½Ø¼ï¿½ï¿½ï¿½           
+    KW_GOTO,      //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_CONTINUE,  //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_BREAK,     //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_DEFAULT,   //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_SIZEOF,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_RETURN,    //ï¿½Ø¼ï¿½ï¿½ï¿½              
+    KW_IF,        //ï¿½Ø¼ï¿½ï¿½ï¿½    
+    KW_PRINTF,    //ï¿½Ø¼ï¿½ï¿½ï¿½
+    KW_SCANF,     //ï¿½Ø¼ï¿½ï¿½ï¿½      
+    END           //ï¿½Ø¼ï¿½ï¿½ï¿½         
 };
 
 enum OPT{
@@ -64,6 +64,14 @@ struct inter_code{
     std::string opt1;
     std::string opt2;
     std::string result;
+};
+
+class midcode{
+    public:
+        std::string s_operation;
+        std::string s_alphaVar;
+        std::string s_betaVar;
+        std::string s_result;
 };
 
 #endif
