@@ -245,18 +245,18 @@ void mips_add(){
     }
     // generate mips order of beta operator
     if(_isNumber(g_curMidcode.s_betaVar)){
-        cout << "\t\tli\t$t0\t" << g_curMidcode.s_betaVar << endl;
+        cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
         int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         // not find in local variable vector
         if(tempAddr_beta == 1){
-            cout << "\t\tla\t$t0\t" << g_curMidcode.s_betaVar << endl;
-            cout << "\t\tlw\t$t0\t($t0)" << endl;
+            cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
+            cout << "\t\tlw\t$t1\t($t0)" << endl;
         }
         // find
         else{
-            cout << "\t\tlw\t$t0\t" << tempAddr_beta << "($fp)" << endl;
+            cout << "\t\tlw\t$t1\t" << tempAddr_beta << "($fp)" << endl;
         }
     }
     // generate mips order of add
@@ -301,18 +301,18 @@ void mips_sub(){
     }
     // generate mips order of beta operator
     if(_isNumber(g_curMidcode.s_betaVar)){
-        cout << "\t\tli\t$t0\t" << g_curMidcode.s_betaVar << endl;
+        cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
         int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         // not find in local variable vector
         if(tempAddr_beta == 1){
-            cout << "\t\tla\t$t0\t" << g_curMidcode.s_betaVar << endl;
-            cout << "\t\tlw\t$t0\t($t0)" << endl;
+            cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
+            cout << "\t\tlw\t$t1\t($t0)" << endl;
         }
         // find
         else{
-            cout << "\t\tlw\t$t0\t" << tempAddr_beta << "($fp)" << endl;
+            cout << "\t\tlw\t$t1\t" << tempAddr_beta << "($fp)" << endl;
         }
     }
     // generate mips order of sub
@@ -357,18 +357,18 @@ void mips_mul(){
     }
     // generate mips order of beta operator
     if(_isNumber(g_curMidcode.s_betaVar)){
-        cout << "\t\tli\t$t0\t" << g_curMidcode.s_betaVar << endl;
+        cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
         int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         // not find in local variable vector
         if(tempAddr_beta == 1){
-            cout << "\t\tla\t$t0\t" << g_curMidcode.s_betaVar << endl;
-            cout << "\t\tlw\t$t0\t($t0)" << endl;
+            cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
+            cout << "\t\tlw\t$t1\t($t0)" << endl;
         }
         // find
         else{
-            cout << "\t\tlw\t$t0\t" << tempAddr_beta << "($fp)" << endl;
+            cout << "\t\tlw\t$t1\t" << tempAddr_beta << "($fp)" << endl;
         }
     }
     // generate mips order of mul
@@ -413,18 +413,18 @@ void mips_div(){
     }
     // generate mips order of beta operator
     if(_isNumber(g_curMidcode.s_betaVar)){
-        cout << "\t\tli\t$t0\t" << g_curMidcode.s_betaVar << endl;
+        cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
         int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         // not find in local variable vector
         if(tempAddr_beta == 1){
-            cout << "\t\tla\t$t0\t" << g_curMidcode.s_betaVar << endl;
-            cout << "\t\tlw\t$t0\t($t0)" << endl;
+            cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
+            cout << "\t\tlw\t$t1\t($t0)" << endl;
         }
         // find
         else{
-            cout << "\t\tlw\t$t0\t" << tempAddr_beta << "($fp)" << endl;
+            cout << "\t\tlw\t$t1\t" << tempAddr_beta << "($fp)" << endl;
         }
     }
     // generate mips order of div
@@ -980,7 +980,7 @@ void mips_exit(){
 
 
 void mips_end(){
-    
+    g_localVari.clear();
 }
 
 
@@ -1001,10 +1001,10 @@ void mips_start(){
         else if(g_curMidcode.s_operation == "chara"){
             mips_chara();
         }
-        else if(g_curMidcode.s_operation == "+"){
+        else if(g_curMidcode.s_operation == "add"){
             mips_add();
         }
-        else if(g_curMidcode.s_operation == "-"){
+        else if(g_curMidcode.s_operation == "sub"){
             mips_sub();
         }
         else if(g_curMidcode.s_operation == "*"){
