@@ -24,6 +24,9 @@
 函数定义参数|void handy(int a)|&lt;para, int, , a&gt;
 函数定义参数|void handy(char c)|&lt;para, char, , c&gt;
 读语句|scanf(a)|&lt;scf, , int, a&gt;
+写语句|printf("a",b)|&lt;prtf, a, b, char&gt;
+写语句|printf("a")|&lt;prtf, a, , char&gt;
+写语句|printf(b)|&lt;prtf, , b, char&gt;
 非主函数带参返回|return (expr)|&lt;ret, , , exist_Var&gt;
 非主函数无参返回|return;|&lt;ret, , , &gt;
 主函数返回|return|&lt;exit, , , &gt;
