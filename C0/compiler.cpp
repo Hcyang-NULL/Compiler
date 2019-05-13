@@ -36,8 +36,7 @@ int main(int argc,char *argv[]){
         g_test();
     }
     vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
-    mips_init(vec_tempFuncarg_2);
-    mips_start();
+    translate(vec_tempFuncarg_2);
     system("pause");
     return 0;
 }
