@@ -9,17 +9,17 @@ using namespace std;
 
 TYPE s, iden;
 
-#define BUFFER_SIZE 100  //»º³åÇø´óĞ¡
+#define BUFFER_SIZE 100  //ç¼“å†²åŒºå¤§å°
 
-FILE *fp;  //ÎÄ¼şÖ¸Õë
-string now = "";  //´¦ÀíÎÄ¼şÃû×ÖÓëµ±Ç°token
-char buffer[BUFFER_SIZE];  //»º³åÇø
-char c;  //µ±Ç°¶ÁÈ¡×Ö·û
-vector<pair<string, TYPE> > w_tokens;  //ÇĞ·ÖµÄtoken½á¹û
-int row;  //µ±Ç°ĞĞÊı
+FILE *fp;  //æ–‡ä»¶æŒ‡é’ˆ
+string now = "";  //å¤„ç†æ–‡ä»¶åå­—ä¸å½“å‰token
+char buffer[BUFFER_SIZE];  //ç¼“å†²åŒº
+char c;  //å½“å‰è¯»å–å­—ç¬¦
+vector<pair<string, TYPE> > w_tokens;  //åˆ‡åˆ†çš„tokenç»“æœ
+int row;  //å½“å‰è¡Œæ•°
 
 /**
- * ´Ó»º³åÇø¶ÁÈ¡Ò»¸ö×Ö·ûµ½c£¬Èç¹û»º³åÇø¶ÁÍêÔòÖØĞÂ´ÓÎÄ¼ş¶ÁÈ¡µ½»º³åÇø
+ * ä»ç¼“å†²åŒºè¯»å–ä¸€ä¸ªå­—ç¬¦åˆ°cï¼Œå¦‚æœç¼“å†²åŒºè¯»å®Œåˆ™é‡æ–°ä»æ–‡ä»¶è¯»å–åˆ°ç¼“å†²åŒº
  */
 void scan(){
     static int p = BUFFER_SIZE;
@@ -41,7 +41,7 @@ void scan(){
 }
 
 /**
- * ÕûÊıDFA
+ * æ•´æ•°DFA
  */
 void NUM_DFA(){
     if(c == '0'){
@@ -50,17 +50,17 @@ void NUM_DFA(){
         now += c;
         scan();
         {
-            if(c >= '0' && c <= '7'){  //Ê¶±ğ°Ë½øÖÆÊı
+            if(c >= '0' && c <= '7'){  //è¯†åˆ«å…«è¿›åˆ¶æ•°
                 now += c;
                 scan();
             }
-            else if(c == 'x'){  //Ê¶±ğÊ®Áù½øÖÆÊı
+            else if(c == 'x'){  //è¯†åˆ«åå…­è¿›åˆ¶æ•°
                 iden = s;
                 s = PRE_HEX;
                 now += c;
                 scan();
             }
-            else if(c == 'b'){  //Ê¶±ğ¶ş½øÖÆÊı
+            else if(c == 'b'){  //è¯†åˆ«äºŒè¿›åˆ¶æ•°
                 iden = s;
                 s = PRE_BIN;
                 now += c;
@@ -135,7 +135,7 @@ void NUM_DFA(){
         }
         return;
     }
-    else{  //Ê¶±ğÊ®½øÖÆÊı
+    else{  //è¯†åˆ«åè¿›åˆ¶æ•°
         iden = s;
         s = DEC;
         now += c;
@@ -155,7 +155,7 @@ void NUM_DFA(){
 }
 
 /**
- * ×Ö·ûDFA
+ * å­—ç¬¦DFA
  */
 void CHAR_DFA(){
     scan();
@@ -201,7 +201,7 @@ void CHAR_DFA(){
 }
 
 /**
- * ×Ö·û´®DFA
+ * å­—ç¬¦ä¸²DFA
  */
 void STR_DFA(){
     scan();
@@ -210,16 +210,17 @@ void STR_DFA(){
             iden = s;
             s = ERR;
         }
-        else if(c == '\\'){
-            scan();
-            if(c == 0){
-                iden = s;
-                s = ERR;
-            }
-            else{
-                now += c;
-            }
-        }
+        // else if(c == '\\'){
+        //     scan();
+        //     if(c == 0){
+        //         iden = s;
+        //         s = ERR;
+        //     }
+        //     else{
+        //         now += c;
+        //         scan();
+        //     }
+        // }
         else if(c == '"'){
             iden = s;
             s = OK;
@@ -233,7 +234,7 @@ void STR_DFA(){
 }
 
 /**
- * ±êÊ¶·ûDFA
+ * æ ‡è¯†ç¬¦DFA
  */
 void TAG_DFA(){
     now += c;
@@ -250,7 +251,7 @@ void TAG_DFA(){
 }
 
 /**
- * ½ç·ûDFA
+ * ç•Œç¬¦DFA
  */
 void BOUND_DFA(){
     now += c;
@@ -320,13 +321,13 @@ void add_token(){
     if(s == OK){
         cout << now << " ";
         switch(iden){
-            case HEX:cout << "Ê®Áù½øÖÆÊı" << endl;break;
-            case DEC:cout << "Ê®½øÖÆÊı" << endl;break;
-            case OCT:cout << "°Ë½øÖÆÊı" << endl;break;
-            case BIN:cout << "¶ş½øÖÆÊı" << endl;break;
-            case BOUND:cout << "½ç·û" << endl;break;
-            case STR:cout << "×Ö·û´®³£Á¿" << endl;break;
-            case CHAR:cout << "×Ö·û³£Á¿" << endl;break;
+            case HEX:cout << "Hex Number" << endl;break;
+            case DEC:cout << "Dec Number" << endl;break;
+            case OCT:cout << "Oct Number" << endl;break;
+            case BIN:cout << "Bin Number" << endl;break;
+            case BOUND:cout << "Bound" << endl;break;
+            case STR:cout << "String const" << endl;break;
+            case CHAR:cout << "Char const" << endl;break;
             case TAG:{
                 if(now == "auto"){
                     iden = KW_AUTO;
@@ -431,13 +432,13 @@ void add_token(){
                     iden = KW_SCANF;
                 }
                 else{
-                    cout << "±êÊ¶·û" << endl;
+                    cout << "Identity" << endl;
                     break;
                 }
-                cout << "¹Ø¼ü×Ö" << endl;
+                cout << "Key word" << endl;
                 break;
             }
-            default:cout << "´íÎó" << endl;break;
+            default:cout << "Error" << endl;break;
         };
         if(iden == HEX || iden == DEC || iden == OCT || iden == BIN){
             iden = NUM;
@@ -502,7 +503,7 @@ void word_initialize(string file){
 //     else{
 //         file = "C:\\Users\\HCY\\Desktop\\Compiler\\C0\\test.c";
 //     }
-//     cout << "´Ê·¨·ÖÎö½á¹û£º" << endl;
+//     cout << "è¯æ³•åˆ†æç»“æœï¼š" << endl;
 //     vector<pair<string, TYPE> > vec_tempFuncarg_1;
 //     word_initialize(file);
 //     vec_tempFuncarg_1 = word_analyze();
