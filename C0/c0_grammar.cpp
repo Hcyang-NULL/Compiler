@@ -16,6 +16,7 @@ int g_errorNum = 0;
 //global handy variable
 int g_address;
 int g_paranum;
+int g_const;
 
 void error(string erro_type){
     cout << "Erro: " << erro_type << endl;
@@ -167,6 +168,12 @@ class symbolTable{
                 }
                 for(int i = 0; i < vec_programIndex[0]; i++){
                     if(vec_symbols[i].s_name == name){
+                        if(vec_symbols[i].i_type == 0){
+                            g_const = 1;
+                        }
+                        else{
+                            g_const = 0;
+                        }
                         return vec_symbols[i].i_value;
                     }
                 }
@@ -670,7 +677,12 @@ void assist_5(){
                 genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "char");
             }
             else{
-                error("Not find declaration of avarible array");
+                if(g_const != 1){
+                    error("Not find declaration of avarible array");
+                }
+                else{
+                    genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "int");
+                }
             }
         }
         else
@@ -694,7 +706,12 @@ void assist_5(){
             genMidcode("prtf", "", opArg_printfBeta, "char");
         }
         else{
-            error("Not find declaration of avarible");
+            if(g_const != 1){
+                error("Not find declaration of avarible array");
+            }
+            else{
+                genMidcode("prtf", "", opArg_printfBeta, "int");
+            }
         }
         return;
     }
