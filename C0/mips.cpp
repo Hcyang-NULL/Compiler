@@ -730,7 +730,7 @@ void mips_bigger(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
@@ -761,7 +761,7 @@ void mips_smaller(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
@@ -792,7 +792,7 @@ void mips_equal(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
@@ -823,7 +823,7 @@ void mips_notEqual(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
@@ -854,7 +854,7 @@ void mips_notBigger(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
@@ -885,7 +885,7 @@ void mips_notSmaller(){
         cout << "\t\tli\t$t1\t" << g_curMidcode.s_betaVar << endl;
     }
     else{
-        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_alphaVar);
+        int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_betaVar);
         if(tempAddr_beta == 1){//not find, is global
             cout << "\t\tla\t$t1\t" << g_curMidcode.s_betaVar << endl;
             cout << "\t\tlw\t$t1\t($t1)" << endl;
