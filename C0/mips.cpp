@@ -459,9 +459,9 @@ void mips_printf(){
         cout << "\t\tmove\t$a0\t$t0" << endl;
         cout << "\t\tli\t$v0\t4" << endl;
         cout << "\t\tsyscall" << endl;
-        cout << "\t\tli\t$a0\t\'\\n\'" << endl;
-        cout << "\t\tli\t$v0\t11" << endl;
-        cout << "\t\tsyscall" << endl;
+        // cout << "\t\tli\t$a0\t\'\\n\'" << endl;
+        // cout << "\t\tli\t$v0\t11" << endl;
+        // cout << "\t\tsyscall" << endl;
     }
     if(g_curMidcode.s_betaVar == ""){
         return;
@@ -489,9 +489,9 @@ void mips_printf(){
         cout << "\t\tli\t$v0\t11" << endl;
     }
     cout << "\t\tsyscall" << endl;
-    cout << "\t\tli\t$a0\t\'\\n\'" << endl;
-    cout << "\t\tli\t$v0\t11" << endl;
-    cout << "\t\tsyscall" << endl;
+    // cout << "\t\tli\t$a0\t\'\\n\'" << endl;
+    // cout << "\t\tli\t$v0\t11" << endl;
+    // cout << "\t\tsyscall" << endl;
 }
 
 
