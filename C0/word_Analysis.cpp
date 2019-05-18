@@ -210,17 +210,6 @@ void STR_DFA(){
             iden = s;
             s = ERR;
         }
-        // else if(c == '\\'){
-        //     scan();
-        //     if(c == 0){
-        //         iden = s;
-        //         s = ERR;
-        //     }
-        //     else{
-        //         now += c;
-        //         scan();
-        //     }
-        // }
         else if(c == '"'){
             iden = s;
             s = OK;
