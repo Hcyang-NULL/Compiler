@@ -166,7 +166,10 @@ void mips_func(){
     // generate order
     cout << g_curMidcode.s_result << ":" << endl;
     cout << "\t\tsubi\t$sp\t$sp\t4" << endl;
-    cout << "\t\tsubi\t$sp\t$sp\t" << g_funcParaNum*4 << endl;
+    if(g_funcParaNum != 0)
+    {
+        cout << "\t\tsubi\t$sp\t$sp\t" << g_funcParaNum*4 << endl;
+    }
     // update global offset
     g_offSet = 8+g_funcParaNum*4;
 }
