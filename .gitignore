@@ -3,4 +3,5 @@ test.c
 test/
 buaa.cpp
 mips.txt
-config.exe
+/C0/*.exe
+!/C0/compiler.exe
