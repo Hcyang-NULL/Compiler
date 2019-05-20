@@ -1,3 +1,4 @@
+#include "optimizer.h"
 #include <iostream>
 #include <stdlib.h>
 #include <string>
@@ -36,6 +37,8 @@ int main(int argc,char *argv[]){
         g_test();
     }
     vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
+    opt::_exprOptimizer(vec_tempFuncarg_2);
+    system("pause");
     translate(vec_tempFuncarg_2);
     system("pause");
     return 0;

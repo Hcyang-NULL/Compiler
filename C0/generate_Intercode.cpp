@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "config.h"
+#include "generate_intercode.h"
 
 using namespace std;
 
@@ -28,4 +29,13 @@ void mid_out(){
 
 vector<midcode> getVecMidcodes(){
     return g_vec_midcodes;
+}
+
+midcode genMidcode::optMidcode(string operation, string alphaVar, string betaVar, string result){
+    midcode mc_temp;
+    mc_temp.s_operation = operation;
+    mc_temp.s_alphaVar = alphaVar;
+    mc_temp.s_betaVar = betaVar;
+    mc_temp.s_result = result;
+    return mc_temp;
 }

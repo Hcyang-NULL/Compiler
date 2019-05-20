@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "config.h"
+#include "mips.h"
 
 using namespace std;
 
@@ -30,7 +31,8 @@ int g_callParaNum = 0;
 int g_offSet = 0;
 bool g_init = true;
 
-bool _isNumber(string s){
+bool _isNumber(string s)
+{
     if(s[0] == '-'){
         return s[1]>='0'&s[1]<='9'?true:false;
     }
@@ -998,10 +1000,10 @@ void mips_start(){
         else if(g_curMidcode.s_operation == "chara"){
             mips_chara();
         }
-        else if(g_curMidcode.s_operation == "add"){
+        else if(g_curMidcode.s_operation == "+"){
             mips_add();
         }
-        else if(g_curMidcode.s_operation == "sub"){
+        else if(g_curMidcode.s_operation == "-"){
             mips_sub();
         }
         else if(g_curMidcode.s_operation == "*"){

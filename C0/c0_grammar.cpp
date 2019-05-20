@@ -555,7 +555,7 @@ void assist_10(){
         item();
         string opArg_tempBeta = getSTK_Top();
         string opArg_tempAlpha = getSTK_Top();
-        genMidcode("add", opArg_tempAlpha, opArg_tempBeta, genVarName());
+        genMidcode("+", opArg_tempAlpha, opArg_tempBeta, genVarName());
         assist_10();
         return;
     }
@@ -563,7 +563,7 @@ void assist_10(){
         item();
         string opArg_tempBeta = getSTK_Top();
         string opArg_tempAlpha = getSTK_Top();
-        genMidcode("sub", opArg_tempAlpha, opArg_tempBeta, genVarName());
+        genMidcode("-", opArg_tempAlpha, opArg_tempBeta, genVarName());
         assist_10();
         return;
     }
