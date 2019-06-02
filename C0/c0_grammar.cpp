@@ -2,185 +2,26 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <stack>
-#include "config.h"
 #include "generate_Intercode.cpp"
+#include "c0_grammar.h"
 
 using namespace std;
 
 vector<pair<string, TYPE> > g_vec_grammarTokens;
 vector<pair<string, TYPE> >::iterator g_iter_grammarTokens;
 pair<string, TYPE> g_currentToken;
-int g_errorNum = 0;
+
 
 //global handy variable
-int g_address;
-int g_paranum;
-int g_const;
+global_Var g;
 
-void error(string erro_type){
-    cout << "Erro: " << erro_type << endl;
-    g_errorNum++;
-    system("pause");
-    exit(1);
-}
+
 
 //symbol table define
-class signal{
-    public:
-        TYPE ty_kwType;
-        stack<string> stk_opArg;
-        bool b_isConst;
-        bool b_isNeg;
-        bool b_isMain;
-};
-class symbol{
-    public:
-        // name of symbol
-        string s_name;
-        // 0:const 1:variable 2:function 3:parameters
-        int i_type;
-        // i_type==0: value of const| i_type=1: 0:int 1:char |i_type==2:function 0:void 1:int
-        int i_value;
-        int i_address;
-        // number of parameters or size of array
-        int i_para;
-};
-class symbolTable{
-    public:
-        vector<symbol> vec_symbols;
-        int i_topIndex;
-        int i_totalProgram;
-        vector<int> vec_programIndex;
-    public:
-        void symbol_test(){
-            cout << "------- Symbol Table --------" << endl;
-            cout << "Total : " << i_topIndex << endl;
-            cout << "Total function : " << i_totalProgram << endl;
-            cout << "-----------------------------" << endl;
-            cout << "Global defination :" << endl;
-            for(int i = 0; i < vec_programIndex[0]; i++){
-                cout << vec_symbols[i].s_name;
-                switch(vec_symbols[i].i_type){
-                    case 0:cout << " [type->Const";break;
-                    case 1:cout << " [type->Variable";break;
-                    case 2:cout << " [type->Error-funciton";break;
-                    case 3:cout << " [type->Error-parameter";break;
-                    default:cout << " [type->Error-none";break;
-                }
-                symbol temp = vec_symbols[i];
-                cout << " value->" << temp.i_value << " address->" << temp.i_address << " para->" << temp.i_para << "]";
-                cout << endl;
-            }
-            cout << "----------------------------" << endl;
-            for(int i = 0; i < i_totalProgram; i++){
-                int j = vec_programIndex[i];
-                int limit = -1;
-                if(i == i_totalProgram-1){
-                    limit = i_topIndex;
-                }
-                else{
-                    limit = vec_programIndex[i+1];
-                }
-                cout << "Function: " << vec_symbols[j].s_name;
-                if(vec_symbols[j].i_value == 0){
-                    cout << " type->void";
-                }
-                else if(vec_symbols[j].i_value == 1){
-                    cout << " type->int";
-                }
-                else{
-                    cout << " type->char";
-                }
-                cout << " para-num->" << vec_symbols[j].i_para << endl;
-                for(j++; j < limit; j++){
-                    cout << vec_symbols[j].s_name;
-                    switch(vec_symbols[j].i_type){
-                        case 0:cout << " [type->Erro-const";break;
-                        case 1:cout << " [type->Variable";break;
-                        case 2:cout << " [type->Error-funciton";break;
-                        case 3:cout << " [type->parameter";break;
-                        default:cout << " [type->Error-none";break;
-                    }
-                    symbol temp = vec_symbols[j];
-                    cout << " value->" << temp.i_value << " address->" << temp.i_address << " para->" << temp.i_para << "]";
-                    cout << endl;
-                }
-                cout << "----------------------------" << endl;
-            }
-        }
-        void insert_symbol(string name, int type, int value, int address, int para){
-            if(type == 2){
-                //insert a name of function
-                for(int i = 0; i < i_totalProgram; i++){
-                    if(vec_symbols[vec_programIndex[i]].s_name == name){
-                        error("Multiply defination of function");
-                        return;
-                    }
-                }
-                vec_programIndex.push_back(i_topIndex);
-                i_totalProgram++;
-                g_paranum = 0;
-            }
-            else{
-                //insert a name of variable
-                if(i_totalProgram != 0){
-                    for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
-                        if(vec_symbols[i].s_name == name){
-                            error("Multiply defination of variable");
-                            return;
-                        }
-                    }
-                }
-            }
-            //real insert operation
-            symbol sym_temp;
-            sym_temp.s_name = name;
-            sym_temp.i_type = type;
-            cout << "test-type = " << type << endl;
-            sym_temp.i_value = value;
-            sym_temp.i_address = address;
-            sym_temp.i_para = para;
-            i_topIndex++;
-            vec_symbols.push_back(sym_temp);
-        }
-        int searchSymbol(string name, int type){
-            if(type == 2){
-                //search a name of function
-                for(int i = 0; i < i_totalProgram; i++){
-                    if(vec_symbols[vec_programIndex[i]].s_name == name){
-                        if(vec_symbols[vec_programIndex[i]].i_para == g_paranum){
-                            return 1;
-                        }
-                        else{
-                            return 0;
-                        }
-                    }
-                }
-                return -1;
-            }
-            else{
-                //search a name of variable
-                for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
-                    if(vec_symbols[i].s_name == name){
-                        return vec_symbols[i].i_value;
-                    }
-                }
-                for(int i = 0; i < vec_programIndex[0]; i++){
-                    if(vec_symbols[i].s_name == name){
-                        if(vec_symbols[i].i_type == 0){
-                            g_const = 1;
-                        }
-                        else{
-                            g_const = 0;
-                        }
-                        return vec_symbols[i].i_value;
-                    }
-                }
-                return -2;
-            }
-        }
-};
+
+
+
+
 
 symbolTable g_symbolTab;
 signal g_signal;
@@ -287,7 +128,7 @@ string getSTK_Top(){
         return temp;
     }
     else{
-        error("Get: stack is empty");
+        error("Get: stack is empty", g);
     }
 }
 
@@ -296,7 +137,7 @@ string requireSTK_Top(){
         return g_signal.stk_opArg.top();
     }
     else{
-        error("Require: stack is empty");
+        error("Require: stack is empty", g);
     }
 }
 
@@ -327,7 +168,7 @@ void if_Sentence(){
             }
         }
     }
-    error("if_Sentence");
+    error("if_Sentence", g);
 }
 
 void assist_15(){
@@ -387,11 +228,11 @@ void for_Sentence(){
                 genMidcode("lab", "", "", opArg_outLableName);
                 return;
             }
-            error("Missing right paren nearing while");
+            error("Missing right paren nearing while", g);
         }
-        error("Missing loop-condition");
+        error("Missing loop-condition", g);
     }
-    error("uncanny mistake in for_Sentence");
+    error("uncanny mistake in for_Sentence", g);
 }
 
 void condition_kid(){
@@ -406,10 +247,10 @@ void condition_kid(){
             sentence();
             return;
         }
-        error("condition_kid branch 1");
+        error("condition_kid branch 1", g);
     }
     else{
-        error("condition_kid none");
+        error("condition_kid none", g);
     }
 }
 
@@ -438,7 +279,7 @@ void switch_Sentence(){
             }
         }
     }
-    error("switch_Sentence");
+    error("switch_Sentence", g);
 }
 
 void assist_12(){
@@ -471,9 +312,9 @@ void func_Call(){
         if(match_S(")", true)){
             return;
         }
-        error("Missing right paren nearing the calling of function");
+        error("Missing right paren nearing the calling of function", g);
     }
-    error("uncanny mistake in func_Call");
+    error("uncanny mistake in func_Call", g);
 }
 
 void assist_14(){
@@ -485,7 +326,7 @@ void assist_14(){
             genMidcode("aAss", opArg_arrayName, opArg_arrayIndex, genVarName());
             return;
         }
-        error("assist_14");
+        error("assist_14", g);
     }
     if(match_S("(", false)){
         func_Call();
@@ -515,10 +356,10 @@ void factor(){
         if(match_S(")", true)){
             return;
         }
-        error("factor branch 1");
+        error("factor branch 1", g);
     }
     else{
-        error("factor none");
+        error("factor none", g);
     }
 }
 
@@ -612,10 +453,10 @@ void assign_Sentence(){
                 return;
             }
         }
-        error("assign_Sentence branch 1");
+        error("assign_Sentence branch 1", g);
     }
     else{
-        error("assign_Sentence none");
+        error("assign_Sentence none", g);
     }
 }
 
@@ -630,19 +471,18 @@ void assist_13(){
         return;
     }
     else{
-        error("assist_13");
+        error("assist_13", g);
     }
 }
 
 void assist_4(){
-    // TODO: default type of input is int, because charator table is not constructed
     genMidcode("scf", "", "int", getSTK_Top());
     if(match_S(",", true)){
         if(match_T(TAG, true)){
             assist_4();
             return;
         }
-        error("assist_4");
+        error("assist_4", g);
     }
     else{
         return;
@@ -660,13 +500,12 @@ string assist_9(){
 }
 
 void assist_5(){
-    // TODO: all type of printf is char, because the charactor table is not constructed now
     if(match_T(STR, true)){
         string opArg_printfAplha = getSTK_Top();
         string opArg_printfBeta = assist_9();
         if(opArg_printfBeta != "")
         {
-            int tempType = g_symbolTab.searchSymbol(opArg_printfBeta, 1);
+            int tempType = g_symbolTab.searchSymbol(opArg_printfBeta, 1, g);
             cout << "variable " << opArg_printfBeta << " type: " << tempType;
             if(tempType == 0)
             {
@@ -677,8 +516,8 @@ void assist_5(){
                 genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "char");
             }
             else{
-                if(g_const != 1){
-                    error("Not find declaration of avarible array");
+                if(g.g_const != 1){
+                    error("Not find declaration of avarible array", g);
                 }
                 else{
                     genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "int");
@@ -695,7 +534,7 @@ void assist_5(){
     else{
         expression();
         string opArg_printfBeta = getSTK_Top();
-        int tempType = g_symbolTab.searchSymbol(opArg_printfBeta, 1);
+        int tempType = g_symbolTab.searchSymbol(opArg_printfBeta, 1, g);
         cout << "variable " << opArg_printfBeta << " type: " << tempType;
         if(tempType == 0)
         {
@@ -706,8 +545,8 @@ void assist_5(){
             genMidcode("prtf", "", opArg_printfBeta, "char");
         }
         else{
-            if(g_const != 1){
-                error("Not find declaration of avarible array");
+            if(g.g_const != 1){
+                error("Not find declaration of avarible array", g);
             }
             else{
                 genMidcode("prtf", "", opArg_printfBeta, "int");
@@ -729,7 +568,7 @@ void assist_6(){
             }
             return;
         }
-        error("assist_6");
+        error("assist_6", g);
     }
     else{
         if(g_signal.b_isMain){
@@ -756,14 +595,14 @@ void sentence(){
         if(match_S("}", true)){
             return;
         }
-        error("sentence branch 1");
+        error("sentence branch 1", g);
     }
     else if(match_T(TAG, true)){
         assist_13();
         if(match_S(";", true)){
             return;
         }
-        error("sentence branch 2");
+        error("sentence branch 2", g);
     }
     else if(match_T(KW_SCANF, true)){
         if(match_S("(", true)){
@@ -776,7 +615,7 @@ void sentence(){
                 }
             }
         }
-        error("sentence branch 3");
+        error("sentence branch 3", g);
     }
     else if(match_T(KW_PRINTF, true)){
         if(match_S("(", true)){
@@ -787,7 +626,7 @@ void sentence(){
                 }
             }
         }
-        error("sentence branch 4");
+        error("sentence branch 4", g);
     }
     else if(match_S(";", true)){
         return;
@@ -801,10 +640,10 @@ void sentence(){
         if(match_S(";", true)){
             return;
         }
-        error("sentence branch 5");
+        error("sentence branch 5", g);
     }
     else{
-        error("sentence none");
+        error("sentence none", g);
     }
 }
 
@@ -839,20 +678,20 @@ void assist_18(){
 void arg_List(){
     if(match_T(KW_INT, false)){
         head_State();
-        g_paranum++;
+        g.g_paranum++;
         string opArg_name = getSTK_Top();
-        g_address++;
-        g_symbolTab.insert_symbol(opArg_name, 3, 0, g_address, 0);
+        g.g_address++;
+        g_symbolTab.insert_symbol(opArg_name, 3, 0, g.g_address, 0, g);
         genMidcode("para", "int", "", opArg_name);
         assist_18();
         return;
     }
     else if(match_T(KW_CHAR, false)){
         head_State();
-        g_paranum++;
+        g.g_paranum++;
         string opArg_name = getSTK_Top();
-        g_address++;
-        g_symbolTab.insert_symbol(opArg_name, 3, 1, g_address, 0);
+        g.g_address++;
+        g_symbolTab.insert_symbol(opArg_name, 3, 1, g.g_address, 0, g);
         genMidcode("para", "char", "", opArg_name);
         assist_18();
         return;
@@ -867,10 +706,10 @@ void void_func_Declare(){
         if(match_T(TAG, true)){
             if(match_S("(", true)){
                 string opArg_funcName = getSTK_Top();
-                g_address = 0;
-                g_paranum = 0;
+                g.g_address = 0;
+                g.g_paranum = 0;
                 genMidcode("func", "void", "", opArg_funcName);
-                g_symbolTab.insert_symbol(opArg_funcName, 2, 0, g_address, g_paranum);
+                g_symbolTab.insert_symbol(opArg_funcName, 2, 0, g.g_address, g.g_paranum, g);
                 arg_List();
                 if(match_S(")", true)){
                     if(match_S("{", true)){
@@ -884,7 +723,7 @@ void void_func_Declare(){
                 }
             }
         }
-        error("void_func_Declare");
+        error("void_func_Declare", g);
     }
 }
 
@@ -893,10 +732,10 @@ void return_func_Declare(){
         head_State();
         if(match_S("(", true)){
             string opArg_funcName = getSTK_Top();
-            g_address = 0;
-            g_paranum = 0;
+            g.g_address = 0;
+            g.g_paranum = 0;
             genMidcode("func", "int", "", opArg_funcName);
-            g_symbolTab.insert_symbol(opArg_funcName, 2, 1, g_address, g_paranum);
+            g_symbolTab.insert_symbol(opArg_funcName, 2, 1, g.g_address, g.g_paranum, g);
             arg_List();
             if(match_S(")", true)){
                 if(match_S("{", true)){
@@ -908,19 +747,19 @@ void return_func_Declare(){
                 }
 
             }
-            error("Missing right paren nearing the declaration of function");
+            error("Missing right paren nearing the declaration of function", g);
         }
-        error("uncanny mistake in declaration of int function");
+        error("uncanny mistake in declaration of int function", g);
     }
     else if(match_T(KW_CHAR, false)){
         head_State();
         if(match_S("(", true)){
             string opArg_funcName = getSTK_Top();
-            g_address = 0;
-            g_paranum = 0;
+            g.g_address = 0;
+            g.g_paranum = 0;
             genMidcode("func", "char", "", opArg_funcName);
             arg_List();
-            g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g_address, g_paranum);
+            g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g.g_address, g.g_paranum, g);
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
@@ -931,9 +770,9 @@ void return_func_Declare(){
                 }
 
             }
-            error("Missing right paren nearing the declaration of function");
+            error("Missing right paren nearing the declaration of function", g);
         }
-        error("uncanny mistake in declaration of char function");
+        error("uncanny mistake in declaration of char function", g);
     }
     else{
         return;
@@ -975,7 +814,7 @@ void assist_3(){
             assist_3();
             return;
         }
-        error("Missing name of variable");
+        error("Missing name of variable", g);
     }
     else{
         return;
@@ -992,9 +831,9 @@ void assist_2(){
                     string opArg_arrayName = getSTK_Top();
                     //insert into symboltab
                     int tempArray_size = atoi(opArg_arrayValue.c_str());
-                    g_address += tempArray_size;
-                    g_paranum = tempArray_size;
-                    g_symbolTab.insert_symbol(opArg_arrayName, 1, 0, g_address, g_paranum);
+                    g.g_address += tempArray_size;
+                    g.g_paranum = tempArray_size;
+                    g_symbolTab.insert_symbol(opArg_arrayName, 1, 0, g.g_address, g.g_paranum, g);
                     genMidcode("inta", "", opArg_arrayValue, opArg_arrayName);
                 }
                 else if(g_signal.ty_kwType == KW_CHAR){
@@ -1002,37 +841,37 @@ void assist_2(){
                     string opArg_arrayName = getSTK_Top();
                     //insert into symboltab
                     int tempArray_size = atoi(opArg_arrayValue.c_str());
-                    g_address += tempArray_size;
-                    g_paranum = tempArray_size;
-                    g_symbolTab.insert_symbol(opArg_arrayName, 1, 1, g_address, g_paranum);
+                    g.g_address += tempArray_size;
+                    g.g_paranum = tempArray_size;
+                    g_symbolTab.insert_symbol(opArg_arrayName, 1, 1, g.g_address, g.g_paranum, g);
                     genMidcode("chara", "", opArg_arrayValue, opArg_arrayName);
                 }
                 else{
-                    error("the type of declaration is not supported");
+                    error("the type of declaration is not supported", g);
                 }
                 return;
             }
         }
-        error("assist_2");
+        error("assist_2", g);
     }
     else{
         //this is a declaration of int or char
         if(g_signal.ty_kwType == KW_INT){
             string opArg_name = getSTK_Top();
-            g_address++;
-            g_paranum = 0;
-            g_symbolTab.insert_symbol(opArg_name, 1, 0, g_address, g_paranum);
+            g.g_address++;
+            g.g_paranum = 0;
+            g_symbolTab.insert_symbol(opArg_name, 1, 0, g.g_address, g.g_paranum, g);
             genMidcode("int", "", "", opArg_name);
         }
         else if(g_signal.ty_kwType == KW_CHAR){
             string opArg_name = getSTK_Top();
-            g_address++;
-            g_paranum = 0;
-            g_symbolTab.insert_symbol(opArg_name, 1, 1, g_address, g_paranum);
+            g.g_address++;
+            g.g_paranum = 0;
+            g_symbolTab.insert_symbol(opArg_name, 1, 1, g.g_address, g.g_paranum, g);
             genMidcode("char", "", "", opArg_name);
         }
         else{
-            error("the type of declaration is not supported");
+            error("the type of declaration is not supported", g);
         }
         return;
     }
@@ -1043,7 +882,7 @@ void type_Iden(){
         return;
     }
     else{
-        error("type_iden");
+        error("type_iden", g);
     }
 }
 
@@ -1053,7 +892,7 @@ void head_State(){
         if(match_T(TAG, true)){
             return;
         }
-        error("head_State");
+        error("head_State", g);
     }
 }
 
@@ -1079,7 +918,7 @@ void varible_Declare(){
                 varible_Declare();
                 return;
             }
-            error("varible_Declare");
+            error("varible_Declare", g);
         }
         else{
             return;
@@ -1116,7 +955,7 @@ void number(){
     else if(match_T(NUM, true)){
         return;
     }
-    error("match number");
+    error("match number", g);
 }
 
 void assist_16(){
@@ -1129,14 +968,14 @@ void assist_16(){
                         string opArg_value = getSTK_Top();
                         string opArg_name = getSTK_Top();
                         //insert symbol
-                        g_address++;
-                        g_paranum = 0;
-                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g_address, g_paranum);
+                        g.g_address++;
+                        g.g_paranum = 0;
+                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g.g_address, g.g_paranum, g);
                         //generate quaternary
                         genMidcode("const","int", opArg_value, opArg_name);
                     }
                     else{
-                        error("Not support assign a int value to char type");
+                        error("Not support assign a int value to char type", g);
                     }
                 }
                 assist_17();
@@ -1148,13 +987,13 @@ void assist_16(){
                         string opArg_value = getSTK_Top();
                         string opArg_name = getSTK_Top();
                         //insert symbol
-                        g_address++;
-                        g_paranum = 0;
-                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g_address, g_paranum);
+                        g.g_address++;
+                        g.g_paranum = 0;
+                        g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g.g_address, g.g_paranum, g);
                         genMidcode("const","char", opArg_value, opArg_name);
                     }
                     else{
-                        error("Not support assign a char value to int type");
+                        error("Not support assign a char value to int type", g);
                     }
                 }
                 assist_17();
@@ -1171,7 +1010,7 @@ void const_Define(){
         g_signal.b_isConst = false;
     }
     else{
-        error("const_Define none");
+        error("const_Define none", g);
     }
 }
 
@@ -1182,7 +1021,7 @@ void const_Declare(){
             const_Declare();
         }
         else{
-            error("const_Declare");
+            error("const_Declare", g);
         }
     }
     else{
@@ -1193,9 +1032,9 @@ void const_Declare(){
 void main_Func(){
     if(match_T(KW_VOID, true)){
         if(match_S("main", true)){
-            g_address = 0;
-            g_paranum = 0;
-            g_symbolTab.insert_symbol("main", 2, -1, g_address, g_paranum);
+            g.g_address = 0;
+            g.g_paranum = 0;
+            g_symbolTab.insert_symbol("main", 2, -1, g.g_address, g.g_paranum, g);
             genMidcode("func", "", "", "main");
             if(match_S("(", true)){
                 if(match_S(")", true)){
@@ -1210,10 +1049,11 @@ void main_Func(){
             }
         }
     }
-    error("main_Func");
+    error("main_Func", g);
 }
 
 void program(){
+    g.init();
     look();
     const_Declare();
     varible_Declare();
@@ -1243,7 +1083,7 @@ void g_test(){
 
 int grammar_analyze(){
     program();
-    return g_errorNum;
+    return g.g_errorNum;
 }
 
 void grammar_initialize(vector<pair<string, TYPE> > arg){
