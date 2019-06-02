@@ -21,12 +21,12 @@ int main(int argc,char *argv[]){
     else{
         file = "C:\\Users\\HCY\\Desktop\\Compiler\\C0\\test.c";
     }
-    cout << "Lex analysis result£º" << endl;
+    cout << "Lex analysis result: " << endl;
     vector<pair<string, TYPE> > vec_tempFuncarg_1;
     cout << file << endl;
     word_initialize(file);
     vec_tempFuncarg_1 = word_analyze();
-    cout << endl << "Grammar analysis result£º" << endl;
+    cout << endl << "Grammar analysis result: " << endl;
     // vector<struct inter_code> vec_tempFuncarg_2;
     int g_tempError = 0;
     grammar_initialize(vec_tempFuncarg_1);
@@ -36,10 +36,12 @@ int main(int argc,char *argv[]){
         cout << endl;
         g_test();
     }
-    vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
-    opt::_exprOptimizer(vec_tempFuncarg_2);
-    system("pause");
-    translate(vec_tempFuncarg_2);
+    symbolTable symTab = getSymbolTab();
+    
+    // vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
+    // opt::_exprOptimizer(vec_tempFuncarg_2);
+    // system("pause");
+    // translate(vec_tempFuncarg_2);
     system("pause");
     return 0;
 }
