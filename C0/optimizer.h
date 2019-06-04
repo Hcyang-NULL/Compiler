@@ -23,8 +23,8 @@ class optMidcode {
 class Block {
     public:
     std::vector<optMidcode> blockCodes;
-    std::vector<Block> preBlocks;
-    std::vector<Block> sucBlocks;
+    std::vector<int> preBlocks;
+    std::vector<int> sucBlocks;
     std::vector<double> inVals;
     std::vector<double> outVals;
 };

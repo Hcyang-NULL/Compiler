@@ -36,9 +36,9 @@ int main(int argc,char *argv[]){
         cout << endl;
         g_test();
     }
-    symbolTable symTab = getSymbolTab();
-    
-    // vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
+    opt optimizer;
+    vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
+    optimizer._DFG_Analysis(vec_tempFuncarg_2);
     // opt::_exprOptimizer(vec_tempFuncarg_2);
     // system("pause");
     // translate(vec_tempFuncarg_2);

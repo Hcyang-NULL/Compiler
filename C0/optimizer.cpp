@@ -134,13 +134,13 @@ void DFG::linkBlocks() {
         if(last.s_operation == "jmp" || last.s_operation == "jne")
         {
             int tarBlock_index = _getTargetBlock(blocks, last.s_result);
-            blocks[tarBlock_index].preBlocks.push_back(blocks[i]);
-            blocks[i].sucBlocks.push_back(blocks[tarBlock_index]);
+            blocks[tarBlock_index].preBlocks.push_back(i);
+            blocks[i].sucBlocks.push_back(tarBlock_index);
         }
         if(last.s_operation != "jmp" && i != blocks.size()-1)
         {
-            blocks[i].sucBlocks.push_back(blocks[i+1]);
-            blocks[i+1].preBlocks.push_back(blocks[i]);
+            blocks[i].sucBlocks.push_back(i+1);
+            blocks[i+1].preBlocks.push_back(i);
         }
     }
 }
@@ -271,23 +271,79 @@ vector<midcode> _getGlbMicos(vector<midcode> midcodes) {
 }
 
 
+void inVal_test(vector<var> vars, Block b, int bi) {
+    cout << "Block" << bi << ": inVals" << endl;
+    for(int i = 0; i < vars.size(); i++)
+    {
+        cout << vars[i].index << ": " << vars[i].name;
+        if(b.inVals[i] == NAC)
+        {
+            cout << "  NAC";
+        }
+        else if(b.inVals[i] == UNDEF)
+        {
+            cout << "  UNDEF";
+        }
+        else
+        {
+            cout << "  " << b.inVals[i];
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+
+void outVal_test(vector<var> vars, Block b, int bi) {
+    cout << "Block" << bi << ": outVals" << endl;
+    for(int i = 0; i < vars.size(); i++)
+    {
+        cout << vars[i].index << ": " << vars[i].name;
+        if(b.outVals[i] == NAC)
+        {
+            cout << "  NAC";
+        }
+        else if(b.outVals[i] == UNDEF)
+        {
+            cout << "  UNDEF";
+        }
+        else
+        {
+            cout << "  " << b.outVals[i];
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+
 void ConstProp::analyze() {
+    vector<double> inInit;
+    for(int i = 0; i < vars.size(); i++)
+    {
+        inInit.push_back(UNDEF);
+    }
     dfg.blocks[0].outVals = boundVals;
     for(int i = 1; i < dfg.blocks.size(); i++)
     {
         dfg.blocks[i].outVals = initVals;
+        dfg.blocks[i].inVals = inInit;
     }
+    
     bool outChange = true;
     while(outChange)
     {
         outChange = false;
         for(int i = 1; i < dfg.blocks.size(); i++)
         {
+            cout << dfg.blocks[dfg.blocks[1].preBlocks[0]].outVals[0] << endl;
             join(dfg.blocks[i]);
+            inVal_test(vars, dfg.blocks[i], i);
             if(translate(dfg.blocks[i]))
             {
                 outChange = true;
             }
+            outVal_test(vars, dfg.blocks[i], i);
         }
     }
 }
@@ -319,12 +375,12 @@ void link_test(DFG dfg) {
         cout << "pre: " << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
-            outOptmidcode(b.preBlocks[j].blockCodes[0]);
+            outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
         }
         cout << "next: " << endl;
         for(int j = 0; j < b.sucBlocks.size(); j++)
         {
-            outOptmidcode(b.sucBlocks[j].blockCodes[0]);
+            outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
         }
         cout << endl;
     }
@@ -373,6 +429,10 @@ bool _isBase_optmico(optMidcode m) {
     {
         return true;
     }
+    if(m.s_result[0] == '$')
+    {
+        return true;
+    }
     return false;
 }
 
@@ -392,6 +452,13 @@ bool _isInit(symbol s) {
 bool _isDeclare(optMidcode m) {
     if(m.s_operation == "int" || m.s_operation == "char" || m.s_operation == "inta" || m.s_operation == "chara"){
         return true;
+    }
+    else if(m.s_operation == "+" || m.s_operation == "-" || m.s_operation == "*" || m.s_operation == "/")
+    {
+        if(m.s_result[0] == '$')
+        {
+            return true;
+        }
     }
     return false;
 }
@@ -451,6 +518,36 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
     {
         initVals.push_back(UNDEF);
     }
+
+    // for(int i = 0; i < vars.size(); i++)
+    // {
+    //     cout << vars[i].index << ": " << vars[i].name;
+    //     if(boundVals[i] == NAC)
+    //     {
+    //         cout << "  NAC";
+    //     }
+    //     else if(boundVals[i] == UNDEF)
+    //     {
+    //         cout << "  UNDEF";
+    //     }
+    //     else
+    //     {
+    //         cout << "  " << boundVals[i];
+    //     }
+    //     if(initVals[i] == NAC)
+    //     {
+    //         cout << "  NAC";
+    //     }
+    //     else if(initVals[i] == UNDEF)
+    //     {
+    //         cout << "  UNDEF";
+    //     }
+    //     else
+    //     {
+    //         cout << "  " << initVals[i];
+    //     }
+    //     cout << endl;
+    // }
 }
 
 
@@ -475,12 +572,16 @@ double ConstProp::join(double left, double right) {
 
 
 void ConstProp::join(Block& b) {
+    // cout << dfg.blocks[b.preBlocks[0]].outVals[0] << endl;
     for(int i = 0; i < b.inVals.size(); i++)
     {
         double val = UNDEF;
+        // cout << b.preBlocks.size() << endl;
+        // outOptmidcode(b.preBlocks[0].blockCodes[0]);
+        // cout << b.preBlocks[0].outVals[0] << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
-            Block preb = b.preBlocks[j];
+            Block& preb = dfg.blocks[b.preBlocks[j]];
             val = join(val, preb.outVals[i]);
         }
         b.inVals[i] = val;
