@@ -31,6 +31,13 @@ void assist_16();
 void arg_List();
 void number();
 
+void error(string erro_type, global_Var g){
+    cout << "Erro: " << erro_type << endl;
+    g.g_errorNum++;
+    system("pause");
+    exit(1);
+}
+
 void symbolTable::symbol_test(){
     cout << "------- Symbol Table --------" << endl;
     cout << "Total : " << i_topIndex << endl;
@@ -1213,9 +1220,9 @@ int grammar_analyze(){
     return g.g_errorNum;
 }
 
-symbolTable getSymbolTab() {
-    return g_symbolTab;
-}
+// symbolTable getSymbolTab() {
+//     return g_symbolTab;
+// }
 
 void grammar_initialize(vector<pair<string, TYPE> > arg){
     g_vec_grammarTokens = arg;

@@ -17,14 +17,6 @@ class global_Var{
 };
 
 
-void error(string erro_type, global_Var g){
-    cout << "Erro: " << erro_type << endl;
-    g.g_errorNum++;
-    system("pause");
-    exit(1);
-}
-
-
 class signal{
     public:
         TYPE ty_kwType;
@@ -55,7 +47,7 @@ class symbolTable{
         int i_topIndex;
         int i_totalProgram;
         vector<int> vec_programIndex;
-        
+
         void symbol_test();
         void insert_symbol(string name, int type, int value, int address, int para, global_Var gn);
         int searchSymbol(string name, int type, global_Var gn);

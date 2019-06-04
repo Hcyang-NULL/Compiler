@@ -6,6 +6,8 @@
 
 using namespace std;
 
+vector<midcode> getVecMidcodes();
+
 class genMidcode
 {
     public:
