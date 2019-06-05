@@ -14,6 +14,26 @@ using namespace std;
 bool g_experOpt_succ;
 
 
+bool equal_NAC(double a) {
+    const double gap = 0.000001;
+    if(fabs(a-NAC) < gap)
+    {
+        return true;
+    }
+    return false;
+}
+
+
+bool equal_UNDEF(double a) {
+    const double gap = 0.000001;
+    if(fabs(a-UNDEF) < gap)
+    {
+        return true;
+    }
+    return false;
+}
+
+
 double _TranNumber(string s) {
     return atof(s.c_str());
 }
@@ -343,13 +363,16 @@ void ConstProp::analyze() {
             {
                 outChange = true;
             }
+
             outVal_test(vars, dfg.blocks[i], i);
         }
     }
 }
 
 
-
+void ConstProp::optimize() {
+    
+}
 
 
 void midcode_print1(vector<midcode> a){
@@ -396,9 +419,11 @@ void opt::_DFG_Analysis(std::vector<midcode> org_midcodes) {
         now_dfg.markFirst();
         now_dfg.splitBlocks();
         now_dfg.linkBlocks();
+        link_test(now_dfg);
         ConstProp cp;
         cp.init(now_dfg, glbmicos);
         cp.analyze();
+        cp.optimize();
     }
 }
 
@@ -552,21 +577,28 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
 
 
 double ConstProp::join(double left, double right) {
-    if(left == NAC || right == NAC)
+    if(equal_NAC(left) || equal_NAC(right))
     {
         return NAC;
     }
-    else if(left == UNDEF)
+    else if(equal_UNDEF(left))
     {
         return right;
     }
-    else if(right == UNDEF)
+    else if(equal_UNDEF(right))
     {
         return left;
     }
     else
     {
-        return NAC;
+        if(fabs(left-right) < 0.000001)
+        {
+            return left;
+        }
+        else
+        {
+            return NAC;
+        }
     }
 }
 
@@ -608,14 +640,17 @@ int ConstProp::searchVar(string s) {
 }
 
 
+
+
+
 double calculate(string op, double a, double b) {
     if(op == "+" || op == "-" || op == "*" || op == "/")
     {
-        if(a == NAC || b == NAC)
+        if(equal_NAC(a) || equal_NAC(b))
         {
             return NAC;
         }
-        else if(a == UNDEF || b == UNDEF)
+        else if(equal_UNDEF(a) || equal_UNDEF(b))
         {
             return UNDEF;
         }
@@ -642,6 +677,7 @@ double calculate(string op, double a, double b) {
 
 
 void ConstProp::translate(optMidcode m, vector<double>& in, vector<double>& out) {
+    cout << in[1] << endl;
     out = in;
     string op = m.s_operation;
     string arg1 = m.s_alphaVar;
@@ -695,18 +731,21 @@ void ConstProp::translate(optMidcode m, vector<double>& in, vector<double>& out)
         else
         {
             int pos = searchVar(arg2);
+            cout << "serch -> " << arg2 << "  index -> " << pos << endl;
             if(pos == -1)
             {
                 assert(0);
             }
             b = in[pos];
         }
+        cout << "a: " << a << "  b: " << b << endl;
         temp = calculate(op, a, b);
         int pos = searchVar(result);
         if(pos == -1)
         {
             assert(0);
         }
+        cout << "pos: " << pos << " value:" << temp << endl;
         out[pos] = temp;
     }
     else if(op == "call")
@@ -737,6 +776,7 @@ bool ConstProp::translate(Block& b) {
     {
         optMidcode nowcode = b.blockCodes[i];
         translate(nowcode, in, out);
+        cout << "test:" << out[1] << endl;
         in = out;
     }
     bool flag = false; 
@@ -749,5 +789,7 @@ bool ConstProp::translate(Block& b) {
         }
     }
     b.outVals = out;
+    cout << "out:" << b.outVals[1] << endl;
+    
     return flag;
 }

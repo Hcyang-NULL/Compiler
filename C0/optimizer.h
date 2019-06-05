@@ -36,6 +36,7 @@ class DFG {
     std::vector<optMidcode> midcodes;
     std::vector<optMidcode> paras;
     std::vector<Block> blocks;
+    std::vector<optMidcode> optmidcodes;
 
     void markFirst();
     void splitBlocks();
@@ -68,6 +69,7 @@ class ConstProp {
 
     void init(DFG dfg, vector<midcode> glbmicos);
     void analyze();
+    void optimize();
 
     private:
     double join(double left, double right);
