@@ -42,10 +42,9 @@ double _TranNumber(string s) {
 void midcode_print2(vector<optMidcode> a){
     for(int i = 0; i < a.size(); i++){
         optMidcode now = a[i];
-        cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", "
-        << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
+        std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
     }
-    cout << endl;
+    std::cout << endl;
 }
 
 
@@ -123,13 +122,12 @@ std::vector<midcode> opt::_exprOptimizer(std::vector<midcode> org_midcodes) {
         }
     }
 
-    cout << "------ Simple expression optimizer ------" << endl;;
+    // std::cout << "------ Simple expression optimizer ------" << endl;;
     for(int i = 0; i < opt_result.size(); i++){
         midcode now = opt_result[i];
-        cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", "
-        << now.s_betaVar << ", " << now.s_result << ">" << endl;
+        // std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
     }
-    cout << "-------------- Completed ----------------" << endl;
+    // std::cout << "-------------- Completed ----------------" << endl;
 
     return opt_result;
 }
@@ -163,6 +161,11 @@ void DFG::linkBlocks() {
             blocks[i+1].preBlocks.push_back(i);
         }
     }
+}
+
+
+void outOptmidcode(optMidcode now) {
+    // std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
 }
 
 
@@ -259,6 +262,40 @@ std::vector<DFG> _splitDFGS(std::vector<optMidcode> midcodes) {
 }
 
 
+double calculate(string op, double a, double b) {
+    if(op == "+" || op == "-" || op == "*" || op == "/")
+    {
+        if(equal_NAC(a) || equal_NAC(b))
+        {
+            return NAC;
+        }
+        else if(equal_UNDEF(a) || equal_UNDEF(b))
+        {
+            return UNDEF;
+        }
+        
+
+        if(op == "+")
+        {
+            return a+b;
+        }
+        else if(op == "-")
+        {
+            return a-b;
+        }
+        else if(op == "*")
+        {
+            return a*b;
+        }
+        else if(op == "/")
+        {
+            return a/b;
+        }
+    }
+}
+
+
+
 // copy midcode to optmidcode
 std::vector<optMidcode> copy_midcode(std::vector<midcode> org_midcodes) {
     std::vector<optMidcode> result;
@@ -292,48 +329,48 @@ vector<midcode> _getGlbMicos(vector<midcode> midcodes) {
 
 
 void inVal_test(vector<var> vars, Block b, int bi) {
-    cout << "Block" << bi << ": inVals" << endl;
+    // std::cout << "Block" << bi << ": inVals" << endl;
     for(int i = 0; i < vars.size(); i++)
     {
-        cout << vars[i].index << ": " << vars[i].name;
+        // std::cout << vars[i].index << ": " << vars[i].name;
         if(b.inVals[i] == NAC)
         {
-            cout << "  NAC";
+            // std::cout << "  NAC";
         }
         else if(b.inVals[i] == UNDEF)
         {
-            cout << "  UNDEF";
+            // std::cout << "  UNDEF";
         }
         else
         {
-            cout << "  " << b.inVals[i];
+            // std::cout << "  " << b.inVals[i];
         }
-        cout << endl;
+        // std::cout << endl;
     }
-    cout << endl;
+    // std::cout << endl;
 }
 
 
 void outVal_test(vector<var> vars, Block b, int bi) {
-    cout << "Block" << bi << ": outVals" << endl;
+    // std::cout << "Block" << bi << ": outVals" << endl;
     for(int i = 0; i < vars.size(); i++)
     {
-        cout << vars[i].index << ": " << vars[i].name;
+        // std::cout << vars[i].index << ": " << vars[i].name;
         if(b.outVals[i] == NAC)
         {
-            cout << "  NAC";
+            // std::cout << "  NAC";
         }
         else if(b.outVals[i] == UNDEF)
         {
-            cout << "  UNDEF";
+            // std::cout << "  UNDEF";
         }
         else
         {
-            cout << "  " << b.outVals[i];
+            // std::cout << "  " << b.outVals[i];
         }
-        cout << endl;
+        // std::cout << endl;
     }
-    cout << endl;
+    // std::cout << endl;
 }
 
 
@@ -356,7 +393,7 @@ void ConstProp::analyze() {
         outChange = false;
         for(int i = 1; i < dfg.blocks.size(); i++)
         {
-            cout << dfg.blocks[dfg.blocks[1].preBlocks[0]].outVals[0] << endl;
+            // std::cout << dfg.blocks[dfg.blocks[1].preBlocks[0]].outVals[0] << endl;
             join(dfg.blocks[i]);
             inVal_test(vars, dfg.blocks[i], i);
             if(translate(dfg.blocks[i]))
@@ -371,41 +408,180 @@ void ConstProp::analyze() {
 
 
 void ConstProp::optimize() {
-    
+    // system("pause");
+    for(int i = 1; i < dfg.blocks.size()-1; i++)
+    {
+        vector<double> in = dfg.blocks[i].inVals;
+        vector<double> out = in;
+        for(int j = 0; j < dfg.blocks[i].blockCodes.size(); j++)
+        {
+            // system("pause");
+            optMidcode now = dfg.blocks[i].blockCodes[j];
+            bool sure = false;
+            double op_value = NAC;
+
+            string op = now.s_operation;
+            string arg1 = now.s_alphaVar;
+            string arg2 = now.s_betaVar;
+            string result = now.s_result;
+
+            // std::cout << op << endl;
+
+            if(op == "=")
+            {
+                double temp;
+                if(_isNumber(arg1))
+                {
+                    sure = false;
+                    temp = _TranNumber(arg1);
+                }
+                else
+                {
+                    sure = true;
+                    int pos = searchVar(arg1);
+                    if(pos == -1)
+                    {
+                        assert(0);
+                    }
+                    temp = in[pos];
+                }
+                int pos = searchVar(result);
+                if(pos == -1)
+                {
+                    assert(0);
+                }
+                out[pos] = temp;
+                op_value = temp;
+            }
+            else if(op == "+" || op == "-" || op == "*" || op == "/")
+            {
+                sure = true;
+                double temp;
+                double a, b;
+                if(_isNumber(arg1))
+                {
+                    a = _TranNumber(arg1);
+                }
+                else
+                {
+                    int pos = searchVar(arg1);
+                    if(pos == -1)
+                    {
+                        assert(0);
+                    }
+                    a = in[pos];
+                }
+                if(_isNumber(arg2))
+                {
+                    b = _TranNumber(arg2);
+                }
+                else
+                {
+                    int pos = searchVar(arg2);
+                    // std::cout << "serch -> " << arg2 << "  index -> " << pos << endl;
+                    if(pos == -1)
+                    {
+                        assert(0);
+                    }
+                    b = in[pos];
+                }
+                // std::cout << "a: " << a << "  b: " << b << endl;
+                temp = calculate(op, a, b);
+                int pos = searchVar(result);
+                if(pos == -1)
+                {
+                    assert(0);
+                }
+                // std::cout << "pos: " << pos << " value:" << temp << endl;
+                out[pos] = temp;
+                op_value = temp;
+            }
+            else if(op == "call")
+            {
+                sure = false;
+                for(int i = 0; i < glb_num; i++)
+                {
+                    int pos = vars[i].index;
+                    out[pos] = NAC;
+                }
+                //format: x=func()
+                if(result != "")
+                {
+                    int pos = searchVar(result);
+                    if(pos == -1)
+                    {
+                        assert(0);
+                    }
+                    out[pos] = NAC;
+                }
+                op_value = NAC;
+            }
+
+            if(sure)
+            {
+                if(equal_NAC(op_value) || equal_UNDEF(op_value))
+                {
+                    dfg.optmidcodes.push_back(now);
+                }
+                else
+                {
+                    optMidcode after;
+                    after.s_operation = "=";
+                    stringstream ss;
+                    ss << op_value;
+                    after.s_alphaVar = ss.str();
+                    after.s_betaVar = "";
+                    after.s_result = result;
+                    dfg.optmidcodes.push_back(after);
+                    // std::cout << "op-result: " << endl;
+                    // outOptmidcode(after);
+                }
+            }
+            else
+            {
+                dfg.optmidcodes.push_back(now);
+            }
+
+            in = out;
+        }
+    }
+
+    for(int i = 0; i < dfg.optmidcodes.size(); i++)
+    {
+        optMidcode now = dfg.optmidcodes[i];
+        std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
+    }
 }
 
 
 void midcode_print1(vector<midcode> a){
     for(int i = 0; i < a.size(); i++){
         midcode now = a[i];
-        cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", "
-        << now.s_betaVar << ", " << now.s_result << ">" << endl;
+        // std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
     }
-    cout << endl;
+    // std::cout << endl;
 }
 
 
-void outOptmidcode(optMidcode now) {
-    cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
-}
+
 
 void link_test(DFG dfg) {
     for(int i = 0; i < dfg.blocks.size(); i++)
     {
         Block b = dfg.blocks[i];
-        cout << "now block > ";
+        // std::cout << "now block > ";
         outOptmidcode(b.blockCodes[0]);
-        cout << "pre: " << endl;
+        // std::cout << "pre: " << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
             outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
         }
-        cout << "next: " << endl;
+        // std::cout << "next: " << endl;
         for(int j = 0; j < b.sucBlocks.size(); j++)
         {
             outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
         }
-        cout << endl;
+        // std::cout << endl;
     }
 }
 
@@ -423,6 +599,7 @@ void opt::_DFG_Analysis(std::vector<midcode> org_midcodes) {
         ConstProp cp;
         cp.init(now_dfg, glbmicos);
         cp.analyze();
+        // system("pause");
         cp.optimize();
     }
 }
@@ -546,32 +723,32 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
 
     // for(int i = 0; i < vars.size(); i++)
     // {
-    //     cout << vars[i].index << ": " << vars[i].name;
+    //     // std::cout << vars[i].index << ": " << vars[i].name;
     //     if(boundVals[i] == NAC)
     //     {
-    //         cout << "  NAC";
+    //         // std::cout << "  NAC";
     //     }
     //     else if(boundVals[i] == UNDEF)
     //     {
-    //         cout << "  UNDEF";
+    //         // std::cout << "  UNDEF";
     //     }
     //     else
     //     {
-    //         cout << "  " << boundVals[i];
+    //         // std::cout << "  " << boundVals[i];
     //     }
     //     if(initVals[i] == NAC)
     //     {
-    //         cout << "  NAC";
+    //         // std::cout << "  NAC";
     //     }
     //     else if(initVals[i] == UNDEF)
     //     {
-    //         cout << "  UNDEF";
+    //         // std::cout << "  UNDEF";
     //     }
     //     else
     //     {
-    //         cout << "  " << initVals[i];
+    //         // std::cout << "  " << initVals[i];
     //     }
-    //     cout << endl;
+    //     // std::cout << endl;
     // }
 }
 
@@ -604,13 +781,13 @@ double ConstProp::join(double left, double right) {
 
 
 void ConstProp::join(Block& b) {
-    // cout << dfg.blocks[b.preBlocks[0]].outVals[0] << endl;
+    // // std::cout << dfg.blocks[b.preBlocks[0]].outVals[0] << endl;
     for(int i = 0; i < b.inVals.size(); i++)
     {
         double val = UNDEF;
-        // cout << b.preBlocks.size() << endl;
+        // // std::cout << b.preBlocks.size() << endl;
         // outOptmidcode(b.preBlocks[0].blockCodes[0]);
-        // cout << b.preBlocks[0].outVals[0] << endl;
+        // // std::cout << b.preBlocks[0].outVals[0] << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
             Block& preb = dfg.blocks[b.preBlocks[j]];
@@ -639,45 +816,8 @@ int ConstProp::searchVar(string s) {
     return -1;
 }
 
-
-
-
-
-double calculate(string op, double a, double b) {
-    if(op == "+" || op == "-" || op == "*" || op == "/")
-    {
-        if(equal_NAC(a) || equal_NAC(b))
-        {
-            return NAC;
-        }
-        else if(equal_UNDEF(a) || equal_UNDEF(b))
-        {
-            return UNDEF;
-        }
-        
-
-        if(op == "+")
-        {
-            return a+b;
-        }
-        else if(op == "-")
-        {
-            return a-b;
-        }
-        else if(op == "*")
-        {
-            return a*b;
-        }
-        else if(op == "/")
-        {
-            return a/b;
-        }
-    }
-}
-
-
 void ConstProp::translate(optMidcode m, vector<double>& in, vector<double>& out) {
-    cout << in[1] << endl;
+    // std::cout << in[1] << endl;
     out = in;
     string op = m.s_operation;
     string arg1 = m.s_alphaVar;
@@ -731,21 +871,21 @@ void ConstProp::translate(optMidcode m, vector<double>& in, vector<double>& out)
         else
         {
             int pos = searchVar(arg2);
-            cout << "serch -> " << arg2 << "  index -> " << pos << endl;
+            // std::cout << "serch -> " << arg2 << "  index -> " << pos << endl;
             if(pos == -1)
             {
                 assert(0);
             }
             b = in[pos];
         }
-        cout << "a: " << a << "  b: " << b << endl;
+        // std::cout << "a: " << a << "  b: " << b << endl;
         temp = calculate(op, a, b);
         int pos = searchVar(result);
         if(pos == -1)
         {
             assert(0);
         }
-        cout << "pos: " << pos << " value:" << temp << endl;
+        // std::cout << "pos: " << pos << " value:" << temp << endl;
         out[pos] = temp;
     }
     else if(op == "call")
@@ -776,7 +916,7 @@ bool ConstProp::translate(Block& b) {
     {
         optMidcode nowcode = b.blockCodes[i];
         translate(nowcode, in, out);
-        cout << "test:" << out[1] << endl;
+        // std::cout << "test:" << out[1] << endl;
         in = out;
     }
     bool flag = false; 
@@ -789,7 +929,7 @@ bool ConstProp::translate(Block& b) {
         }
     }
     b.outVals = out;
-    cout << "out:" << b.outVals[1] << endl;
+    // std::cout << "out:" << b.outVals[1] << endl;
     
     return flag;
 }
