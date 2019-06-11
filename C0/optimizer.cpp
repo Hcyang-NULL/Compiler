@@ -165,7 +165,7 @@ void DFG::linkBlocks() {
 
 
 void outOptmidcode(optMidcode now) {
-    // std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
+    std::cout << "<" << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">   f:" << now.first << endl;
 }
 
 
@@ -179,14 +179,14 @@ void DFG::splitBlocks() {
             Block temp_block;
             temp_block.blockCodes = tempList;
             blocks.push_back(temp_block);
-            midcode_print2(tempList);
+            //midcode_print2(tempList);
             tempList.clear();
         }
         tempList.push_back(midcodes[i]);
     }
     Block last_block;
     last_block.blockCodes = tempList;
-    midcode_print2(tempList);
+    //midcode_print2(tempList);
     blocks.push_back(last_block);
 }
 
@@ -249,7 +249,7 @@ std::vector<DFG> _splitDFGS(std::vector<optMidcode> midcodes) {
             {
                 if(midcodes[i].s_operation == "end")
                 {
-                    temp_dfg.midcodes.push_back(midcodes[i++]);
+                    temp_dfg.midcodes.push_back(midcodes[i]);
                     break;
                 }
                 temp_dfg.midcodes.push_back(midcodes[i]);
@@ -257,6 +257,7 @@ std::vector<DFG> _splitDFGS(std::vector<optMidcode> midcodes) {
             }
             dfgs.push_back(temp_dfg);
         }
+        
     }
     return dfgs;
 }
@@ -408,14 +409,12 @@ void ConstProp::analyze() {
 
 
 void ConstProp::optimize() {
-    // system("pause");
     for(int i = 1; i < dfg.blocks.size()-1; i++)
     {
         vector<double> in = dfg.blocks[i].inVals;
         vector<double> out = in;
         for(int j = 0; j < dfg.blocks[i].blockCodes.size(); j++)
         {
-            // system("pause");
             optMidcode now = dfg.blocks[i].blockCodes[j];
             bool sure = false;
             double op_value = NAC;
@@ -516,6 +515,12 @@ void ConstProp::optimize() {
                 }
                 op_value = NAC;
             }
+            else if(op == "scf")
+            {
+                int pos = searchVar(result);
+                out[pos] = NAC;
+                op_value = NAC;
+            }
 
             if(sure)
             {
@@ -546,11 +551,13 @@ void ConstProp::optimize() {
         }
     }
 
+    std::cout << "optimize result: " << endl;
     for(int i = 0; i < dfg.optmidcodes.size(); i++)
     {
         optMidcode now = dfg.optmidcodes[i];
         std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
     }
+    std::cout << endl;
 }
 
 
@@ -570,22 +577,23 @@ void link_test(DFG dfg) {
     {
         Block b = dfg.blocks[i];
         // std::cout << "now block > ";
-        outOptmidcode(b.blockCodes[0]);
+        //outOptmidcode(b.blockCodes[0]);
         // std::cout << "pre: " << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
-            outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
+            //outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
         }
         // std::cout << "next: " << endl;
         for(int j = 0; j < b.sucBlocks.size(); j++)
         {
-            outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
+            // outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
         }
         // std::cout << endl;
     }
 }
 
 void opt::_DFG_Analysis(std::vector<midcode> org_midcodes) {
+    // freopen("out.txt", "w", stdout);
     std::vector<midcode> glbmicos = _getGlbMicos(org_midcodes);
     std::vector<optMidcode> midcodes = copy_midcode(org_midcodes);
     std::vector<DFG> dfgs = _splitDFGS(midcodes);
@@ -598,8 +606,8 @@ void opt::_DFG_Analysis(std::vector<midcode> org_midcodes) {
         link_test(now_dfg);
         ConstProp cp;
         cp.init(now_dfg, glbmicos);
+        // std::cout << "out" << endl;
         cp.analyze();
-        // system("pause");
         cp.optimize();
     }
 }
@@ -652,16 +660,20 @@ bool _isInit(symbol s) {
 
 
 bool _isDeclare(optMidcode m) {
-    if(m.s_operation == "int" || m.s_operation == "char" || m.s_operation == "inta" || m.s_operation == "chara"){
+    if(m.s_result[0] == '$')
+    {
         return true;
     }
-    else if(m.s_operation == "+" || m.s_operation == "-" || m.s_operation == "*" || m.s_operation == "/")
-    {
-        if(m.s_result[0] == '$')
-        {
-            return true;
-        }
+    else if(m.s_operation == "int" || m.s_operation == "char" || m.s_operation == "inta" || m.s_operation == "chara"){
+        return true;
     }
+    // else if(m.s_operation == "+" || m.s_operation == "-" || m.s_operation == "*" || m.s_operation == "/")
+    // {
+    //     if(m.s_result[0] == '$')
+    //     {
+    //         return true;
+    //     }
+    // }
     return false;
 }
 
@@ -673,11 +685,6 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
     for(int i = 0; i < glbmicos.size(); i++)
     {
         midcode micoTemp = glbmicos[i];
-        if(micoTemp.s_operation == "func")
-        {
-            glb_num = index;
-            break;
-        }
 
         var varTemp = makeVar(micoTemp.s_result, index++);
         vars.push_back(varTemp);
@@ -693,6 +700,7 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
         }
         boundVals.push_back(val);
     }
+    glb_num = index;
     //处理函数参数
     for(int i = 0; i < dfg.paras.size(); i++)
     {
@@ -704,6 +712,11 @@ void ConstProp::init(DFG dfg_now, vector<midcode> glbmicos) {
     for(int i = 0; i < dfg.midcodes.size(); i++)
     {
         optMidcode temp = dfg.midcodes[i];
+        bool find = false;
+        if(temp.s_result == "a")
+        {
+            find = true;
+        }
         if(_isDeclare(temp))
         {
             var varTemp = makeVar(temp.s_result, index++);
@@ -905,6 +918,11 @@ void ConstProp::translate(optMidcode m, vector<double>& in, vector<double>& out)
             }
             out[pos] = NAC;
         }
+    }
+    else if(op == "scf")
+    {
+        int pos = searchVar(result);
+        out[pos] = NAC;
     }
 }
 
