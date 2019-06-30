@@ -132,7 +132,7 @@ void symbolTable::insert_symbol(string name, int type, int value, int address, i
 }
 
 
-int symbolTable::searchSymbol(string name, int type, global_Var gn){
+int symbolTable::searchSymbol(string name, int type, global_Var& gn){
     if(type == 2){
         //search a name of function
         for(int i = 0; i < i_totalProgram; i++){
@@ -679,6 +679,7 @@ void assist_5(){
             genMidcode("prtf", "", opArg_printfBeta, "char");
         }
         else{
+            printf("ttttt const %d", g.g_const);
             if(g.g_const != 1){
                 error("Not find declaration of avarible array", g);
             }
@@ -868,6 +869,7 @@ void return_func_Declare(){
             string opArg_funcName = getSTK_Top();
             g.g_address = 0;
             g.g_paranum = 0;
+            cout << opArg_funcName << endl;
             genMidcode("func", "int", "", opArg_funcName);
             g_symbolTab.insert_symbol(opArg_funcName, 2, 1, g.g_address, g.g_paranum, g);
             arg_List();
@@ -892,8 +894,8 @@ void return_func_Declare(){
             g.g_address = 0;
             g.g_paranum = 0;
             genMidcode("func", "char", "", opArg_funcName);
-            arg_List();
             g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g.g_address, g.g_paranum, g);
+            arg_List();
             if(match_S(")", true)){
                 if(match_S("{", true)){
                     compound_Sentence();
@@ -1104,7 +1106,9 @@ void assist_16(){
                         //insert symbol
                         g.g_address++;
                         g.g_paranum = 0;
+                        // g.g_const = 1;
                         g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g.g_address, g.g_paranum, g);
+                        // g.g_const = 0;
                         //generate quaternary
                         genMidcode("const","int", opArg_value, opArg_name);
                     }
@@ -1123,7 +1127,9 @@ void assist_16(){
                         //insert symbol
                         g.g_address++;
                         g.g_paranum = 0;
+                        // g.g_const = 1;
                         g_symbolTab.insert_symbol(opArg_name, 0, atoi(opArg_value.c_str()), g.g_address, g.g_paranum, g);
+                        // g.g_const = 0;
                         genMidcode("const","char", opArg_value, opArg_name);
                     }
                     else{

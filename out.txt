@@ -1,0 +1,41 @@
+end
+end
+end
+end
+dfg size = 2
+dfg index: 0
+<func, int, , fun>   f:1
+
+<int, , , y>   f:1
+<+, 7, g, $hcy_1>   f:0
+<=, $hcy_1, , y>   f:0
+<ret, , , 1>   f:0
+
+<end, , , fun>   f:1
+
+-------------
+glbnumer = 1
+-------------
+out
+请按任意键继续. . . 
+optimize result: 
+< int, , , y>
+< =, 12, , $hcy_1>
+< =, 12, , y>
+< ret, , , 1>
+dfg index: 1
+<func, , , main>   f:1
+
+<int, , , a>   f:1
+<call, fun, , $hcy_2>   f:0
+<=, $hcy_2, , a>   f:0
+
+<end, , , main>   f:1
+
+-------------
+glbnumer = 1
+-------------
+out
+请按任意键继续. . . 
+global number = 1
+请按任意键继续. . . 

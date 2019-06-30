@@ -13,6 +13,15 @@ using namespace std;
 
 string file = "";
 
+midcode transform_one(optMidcode now) {
+    midcode p;
+    p.s_operation = now.s_operation;
+    p.s_alphaVar = now.s_alphaVar;
+    p.s_betaVar = now.s_betaVar;
+    p.s_result = now.s_result;
+    return p;
+}
+
 int main(int argc,char *argv[]){
     
     if(argc > 1){
@@ -39,9 +48,84 @@ int main(int argc,char *argv[]){
     opt optimizer;
     vector<midcode> vec_tempFuncarg_2 = getVecMidcodes();
     optimizer._DFG_Analysis(vec_tempFuncarg_2);
+    vector<optMidcode> vec_tempFuncarg_3 = optimizer.getFinalOptMidcodes();
+
+    vector<midcode> vec_tempFuncarg_4;
+    bool start = false;
+    int gap_index = 0;
+    bool fill = false;
+    for(int i = 0; i < vec_tempFuncarg_2.size(); i++)
+    {
+        midcode now = vec_tempFuncarg_2[i];
+        if(false == start)
+        {
+            if(now.s_operation != "func")
+            {
+                vec_tempFuncarg_4.push_back(now);
+                continue;
+            }
+            else
+            {
+                start = true;
+                i--;
+                continue;
+            }
+        }
+        else
+        {
+            if(now.s_operation == "func")
+            {
+                vec_tempFuncarg_4.push_back(now);
+                fill = false;
+                continue;
+            }
+            else if(now.s_operation != "func" && now.s_operation != "end")
+            {
+                if(false == fill)
+                {
+                    while(true)
+                    {
+                        optMidcode optnow = vec_tempFuncarg_3[gap_index];
+                        if(optnow.s_operation != "GAP")
+                        {
+                            vec_tempFuncarg_4.push_back(transform_one(optnow));
+                            gap_index++;
+                            continue;
+                        }
+                        else
+                        {
+                            gap_index++;
+                            break;
+                        }
+                    }
+                    fill = true;
+                }
+                continue;
+            }
+            else if(now.s_operation == "end")
+            {
+                vec_tempFuncarg_4.push_back(now);
+                continue;
+            }
+        }
+        
+    }
+
+    cout << "----------------------------" << endl;
+    for(int i = 0; i < vec_tempFuncarg_4.size(); i++)
+    {
+        midcode now = vec_tempFuncarg_4[i];
+        std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
+    }
+    cout << "----------------------------" << endl;
+    for(int i = 0; i < vec_tempFuncarg_2.size(); i++)
+    {
+        midcode now = vec_tempFuncarg_2[i];
+        std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
+    }
     // opt::_exprOptimizer(vec_tempFuncarg_2);
-    // system("pause");
-    // translate(vec_tempFuncarg_2);
+    // system("pause");.
+    translate(vec_tempFuncarg_4);
     system("pause");
     return 0;
 }

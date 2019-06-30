@@ -48,6 +48,7 @@ class opt {
     public:
     std::vector<midcode> _exprOptimizer(std::vector<midcode> org_midcodes);
     void _DFG_Analysis(std::vector<midcode> org_midcodes);
+    vector<optMidcode> getFinalOptMidcodes();
 };
 
 

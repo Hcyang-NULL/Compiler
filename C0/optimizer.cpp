@@ -12,7 +12,7 @@
 using namespace std;
 
 bool g_experOpt_succ;
-
+vector<optMidcode> final_optmidcodes;
 
 bool equal_NAC(double a) {
     const double gap = 0.000001;
@@ -556,8 +556,20 @@ void ConstProp::optimize() {
     {
         optMidcode now = dfg.optmidcodes[i];
         std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
+        final_optmidcodes.push_back(now);
     }
+    optMidcode gap;
+    gap.s_operation = "GAP";
+    gap.s_alphaVar = "GAP";
+    gap.s_betaVar = "GAP";
+    gap.s_result = "GAP";
+    final_optmidcodes.push_back(gap);
     std::cout << endl;
+}
+
+
+vector<optMidcode> opt::getFinalOptMidcodes() {
+    return final_optmidcodes;
 }
 
 
@@ -576,19 +588,19 @@ void link_test(DFG dfg) {
     for(int i = 0; i < dfg.blocks.size(); i++)
     {
         Block b = dfg.blocks[i];
-        // std::cout << "now block > ";
-        //outOptmidcode(b.blockCodes[0]);
-        // std::cout << "pre: " << endl;
+        std::cout << "now block > ";
+        outOptmidcode(b.blockCodes[0]);
+        std::cout << "pre: " << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
         {
-            //outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
+            outOptmidcode(dfg.blocks[b.preBlocks[j]].blockCodes[0]);
         }
-        // std::cout << "next: " << endl;
+        std::cout << "next: " << endl;
         for(int j = 0; j < b.sucBlocks.size(); j++)
         {
-            // outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
+            outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
         }
-        // std::cout << endl;
+        std::cout << endl;
     }
 }
 

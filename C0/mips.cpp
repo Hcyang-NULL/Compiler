@@ -697,6 +697,10 @@ void mips_assign(){
             cout << "\t\tlw\t$t0\t" << tempAddr_alpha << "($fp)" << endl;
         }
     }
+    if(_isHcyVariable(g_curMidcode.s_result))
+    {
+        _storeLocal(g_curMidcode.s_result);
+    }
     int tempAddr_beta = -1*_locateAddr(g_curMidcode.s_result);
     if(tempAddr_beta == 1){//not find, is global
         cout << "\t\tla\t$t1\t" << g_curMidcode.s_result << endl;
