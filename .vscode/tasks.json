@@ -10,7 +10,6 @@
         "-o",
         "${fileDirname}\\${fileBasenameNoExtension}.exe",
         "${fileDirname}\\optimizer.cpp",
-        
       ],
       "options": {
         "cwd": "E:\\MinGW\\bin"

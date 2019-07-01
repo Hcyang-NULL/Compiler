@@ -585,10 +585,12 @@ void midcode_print1(vector<midcode> a){
 
 
 void link_test(DFG dfg) {
+    std::cout << endl << "------------ DFG ----------" << endl;
     for(int i = 0; i < dfg.blocks.size(); i++)
     {
+        std::cout << "# # # # # # # # # # # # # # # # #" << endl;
         Block b = dfg.blocks[i];
-        std::cout << "now block > ";
+        std::cout << "now block : " << endl;
         outOptmidcode(b.blockCodes[0]);
         std::cout << "pre: " << endl;
         for(int j = 0; j < b.preBlocks.size(); j++)
@@ -600,6 +602,7 @@ void link_test(DFG dfg) {
         {
             outOptmidcode(dfg.blocks[b.sucBlocks[j]].blockCodes[0]);
         }
+        // std::cout << "# # # # # # # # # # # # # # # # #" << endl;
         std::cout << endl;
     }
 }

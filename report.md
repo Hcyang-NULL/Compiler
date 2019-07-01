@@ -9,7 +9,7 @@
 |             文法说明             |  OK  |
 |           系统总体设计           |  OK  |
 |             详细设计             |  OK  |
-| 测试用例及测试结果（截图、说明） |      |
+| 测试用例及测试结果（截图、说明） |  OK  |
 |    实验过程中解决的问题和说明    |      |
 |             其他附录             |      |
 
@@ -42,7 +42,7 @@
 
 ## 详细设计
 
-### 1、词法分析
+### 词法分析
 
 * 使用DFA来进行对单词的识别，主要有数字常量识别DFA，字符常量识别DFA，字符串常量识别DFA，标识符识别DFA以及界符识别DFA
   * 数字常量识别DFA（支持十六进制、十进制、八进制、二进制）
@@ -72,7 +72,7 @@
   * 其中每一对pair里的string为识别的单词，TYPE为其所对应的类别（在config.h中定义）
   * 例子：**[("void", KW_VOID), ("main", TAG), ("(", BOUND), (")", BOUND)]**
 
-### 2、语法分析
+### 语法分析
 
 采用C0文法，使用递归下降子程序实现语法分析
 
@@ -213,7 +213,7 @@
   * 若存在语法错误，则直接给出错误信息（如缺少匹配的有括号等）
   * 若程序无语法错误，则语法分析正常通过，无变量生成
 
-### 3、四元式生成
+### 四元式生成
 
 * 四元式定义
 
@@ -277,7 +277,7 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
     };
     ```
 
-### 4、语法制导翻译
+### 语法制导翻译
 
 * 根据生成的四元式依次按顺序进行翻译，同时使用符号表查找偏移与变量
 
@@ -379,7 +379,7 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
 
   * 得到的汇编语句结果输出到 mips.txt 中
 
-### 5、优化
+### 优化
 
 * 使用了数据流分析框架（DFG），而后实现了常量传播优化
 
@@ -536,6 +536,87 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
 
   * 优化代码在将四元式集合送入翻译之前对四元式集合进行优化，因此结果直接体现在四元式集合上
 
+### 符号表设计
+
+* 符号表类
+
+  ```c++
+  class symbolTable{
+      public:
+          int i_topIndex;
+          int i_totalProgram;
+          vector<int> vec_programIndex;
+      	vector<symbol> vec_symbols;
+  };
+  ```
+
+  **说明**
+
+  |              变量              |             说明             |
+  | :----------------------------: | :--------------------------: |
+  |           i_topIndex           |    符号表中的所有变量个数    |
+  |         i_totalProgram         |    符号表中的所有函数数量    |
+  | vector< int > vec_programIndex | 每一个函数对应的变量开始位置 |
+  |  vector< symbol > vec_symbols  |       所有变量具体信息       |
+
+* 符号类
+
+  ```c++
+  class symbol{
+      public:
+          string s_name;
+          int i_type;
+          int i_value;
+          int i_address;
+          int i_para;
+  };
+  ```
+
+  **说明：**
+
+  s_name：符号的名字
+
+  i_type：
+
+  | 取值 |  类别  |
+  | :--: | :----: |
+  |  0   | 常量名 |
+  |  1   | 变量名 |
+  |  2   | 函数名 |
+  |  3   | 参数名 |
+
+  i_value：
+
+  | i_type取值 | i_value取值 |    类别    |
+  | :--------: | :---------: | :--------: |
+  |     0      |     any     |  常量的值  |
+  |     1      |      0      | int型变量  |
+  |     1      |      1      | char型变量 |
+  |     2      |      0      | void型函数 |
+  |     2      |      1      | int型函数  |
+
+  i_address：符号对应的偏移
+
+  i_para：符号对应的数组大小（如果是数组的话，否则为0）
+
+### 中间变量与表达式栈
+
+* 由于存在1+2+3+4这样的表达式，但按照语法分析不能一次分析完，先是1+(...)，而后再依次如此分析因此每一步需要一个中间量来存储，为了不和用户定义变量冲突，我定义中间变量为字符串**"$hcy_"**加上一个数字，这个数字用全局变量计数控制，保证不会有两个地方用到相同名字的中间变量
+
+* 在处理长运算表达式时，我经过仔细的分析，发现符合栈的特性，以1+2+3+4为例，首先1压栈，读取运算符+，而后2压栈，这时由于没有高优先级运算符，处理+号，为取得操作数，弹栈两次，生成加法四元式，结果存入$hcy_1中，再将$hcy_1压栈，再读取+号，读取3压栈，此时处理刚读取的+号，弹栈两次即$hcy_1+3，结果存入$hcy_2，再压栈，如此进行
+
+* 若存在括号，高级运算符时，仍然满足这个特性，如(1+2) * (3+4)，先是处理为($hcy_1) * (3+4)，而后由于有括号，语法分析会先进入括号中，处理为($hcy_1) * ($hcy_2)，最后再处理为$hcy_3，结束
+
+* 因此，在处理表达式时，设计了表达式栈，用于辅助生成对应的四元式
+
+* 例子：
+
+  * 表达式：a = 1 * ( 2 + 3 / 4 ) - 5;
+
+  * 四元式结果：
+
+    ![1561969022120](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561969022120.png)
+
 ## 测试
 
 ### 基础测试
@@ -624,7 +705,7 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
       char c[3];
       printf("\n>> func5 test");
       c[0] = 'a';
-      c[1] = p1;
+      c[1] = 'g';
       c[2] = 'z';
       g_c4 = c[1];
       printf("\nc[1] = ", g_c4);
@@ -668,9 +749,10 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
       printf("\n<< func3 return: ", res_c);
       func4(res_i);
       printf("\n<< func4");
-      res_i = func5(res_i);
+      res_i = func5(res_c);
+      func5(99);
       printf("\n<< func5 return: ", res_i);
-      res_c = func6('a','b');
+      res_c = func6(52,97);
       printf("\n<< func6 return: ", res_c);
       printf("\nEnd\n");
   }
@@ -693,13 +775,30 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
   >> func1 test
   g_i1 = 10
   g_c2 = 65
+  g_i4 = 100
+  g_c3 = H
+  g_i2 = 6
+  g_c1 = C
   << func1 return
   >> func2 test
-  input integer a:1
-  
-  confirm a: 1
+  input integer a:730
+  confirm a: 730
   input character b:97
-  
+  confirm b: a
+  << func2 return: 0
+  >> func3 testBegin
+  >> func1 test
+  g_i1 = 10
+  g_c2 = 65
+  g_i4 = 100
+  g_c3 = H
+  g_i2 = 6
+  g_c1 = C
+  << func1 return
+  >> func2 test
+  input integer a:730
+  confirm a: 730
+  input character b:97
   confirm b: a
   << func2 return: 0
   >> func3 test
@@ -712,6 +811,9 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
   p1 = 3
   << func4
   >> func5 test
+  c[1] = g
+  >> func5 test
+  c[1] = g
   << func5 return: 0
   >> func6 test
   abcdefghijklmnopqrstuvwxyz
@@ -722,3 +824,810 @@ while语句|while(condition){sentence}|&lt;较多略&gt;
   ```
 
   注：由于MARS输出框无法最大化，截图有点困难，因此是将I/O输出粘贴至此，绝对真实且可以验证
+
+### 集成测试
+
+* 汉诺塔程序：
+
+  * 源代码：
+
+    ```c++
+    void move(int n,char x,char y,char z) {
+        if (n==1) {
+            printf(x);
+            printf("--->",z);
+            printf("\n");
+        }else {
+            move(n-1,x,z,y);
+            printf(x);
+            printf("--->",z);
+            printf("\n");
+            move(n-1,y,x,z);
+        }
+    }
+    
+    void main()
+    {
+        int n;
+        printf("Input number : ");
+        scanf(n);
+        move(n,'X','Y','Z');
+        return (0);
+    }
+    ```
+
+  * 编译结果：
+
+    ```assembly
+    .data
+    $string0:	.asciiz	"--->"
+    $string1:	.asciiz	"\n"
+    $string2:	.asciiz	"--->"
+    $string3:	.asciiz	"\n"
+    $string4:	.asciiz	"Input number : "
+    .text
+    .globl main
+    		j	main
+    move:
+    		subi	$sp	$sp	4
+    		move	$t0	$a0
+    		sw	$t0	-8($fp)
+    		subi	$sp	$sp	4
+    		move	$t0	$a1
+    		sw	$t0	-12($fp)
+    		subi	$sp	$sp	4
+    		move	$t0	$a2
+    		sw	$t0	-16($fp)
+    		subi	$sp	$sp	4
+    		move	$t0	$a3
+    		sw	$t0	-20($fp)
+    		subi	$sp	$sp	4
+    		lw	$t0	-8($fp)
+    		li	$t1	1
+    		bne	$t0	$t1	_LABLE_1
+    		lw	$a0	-12($fp)
+    		li	$v0	11
+    		syscall
+    		la	$t0	$string0
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		lw	$a0	-20($fp)
+    		li	$v0	11
+    		syscall
+    		la	$t0	$string1
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		j	_LABLE_2
+    _LABLE_1:
+    		lw	$t0	-8($fp)
+    		li	$t1	1
+    		sub	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-24($fp)
+    		lw	$a0	-24($fp)
+    		lw	$a1	-12($fp)
+    		lw	$a2	-20($fp)
+    		lw	$a3	-16($fp)
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	move
+    		nop
+    		lw	$a0	-12($fp)
+    		li	$v0	11
+    		syscall
+    		la	$t0	$string2
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		lw	$a0	-20($fp)
+    		li	$v0	11
+    		syscall
+    		la	$t0	$string3
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		lw	$t0	-8($fp)
+    		li	$t1	1
+    		sub	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-28($fp)
+    		lw	$a0	-28($fp)
+    		lw	$a1	-16($fp)
+    		lw	$a2	-12($fp)
+    		lw	$a3	-20($fp)
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	move
+    		nop
+    _LABLE_2:
+    		move	$t0	$ra
+    		lw	$ra	-4($fp)
+    		add	$sp	$fp	$zero
+    		lw	$fp	($fp)
+    		jr	$t0
+    main:
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	16
+    		subi	$sp	$sp	4
+    		la	$t0	$string4
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		li	$v0	5
+    		syscall
+    		sw	$v0	-24($fp)
+    		lw	$a0	-24($fp)
+    		li	$a1	88
+    		li	$a2	89
+    		li	$a3	90
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	move
+    		nop
+    		li	$v0	10
+    		syscall
+    ```
+
+  * 运行结果（MARS）：
+
+    ```
+    Input number : 4
+    X--->Y
+    X--->Z
+    Y--->Z
+    X--->Y
+    Z--->X
+    Z--->Y
+    X--->Y
+    X--->Z
+    Y--->Z
+    Y--->X
+    Z--->X
+    Y--->Z
+    X--->Y
+    X--->Z
+    Y--->Z
+    
+    -- program is finished running --
+    ```
+
+* 快速排序
+
+  * 源程序
+
+    ```c++
+    int a[5];
+    
+    void quicksort(int l,int r) 
+    { 
+        int i,j;
+        int tmp,tt;
+        i = l;
+        j = r;
+        tmp = a[(l+r)/2];
+        while(i <= j)
+        {  
+            while(a[j] > tmp)
+            {
+                j = j-1;
+            }
+            while(a[i] < tmp)
+            {
+                i = i+1;
+            }
+            if(i<=j)
+            {
+                tt=a[i];
+                a[i]=a[j];
+                a[j]=tt;
+                i = i+1;
+                j = j-1;
+            }
+        }
+        if(i<r)
+        {
+            quicksort(i,r);
+        }
+        if(j>l)
+        {
+            quicksort(l,j);
+        }
+    }
+    
+    void main()
+    {
+    	int i,j;
+        a[0] = 8;
+        a[1] = 9;
+        a[2] = 5;
+        a[3] = 7;
+        a[4] = 6;
+        i = 0;
+        printf("Before sort: ");
+    	while(i<5)
+        {
+            j = a[i];
+    		printf(" ",j);
+            i = i+1;
+        }
+        printf("\nAfter  sort: ");
+    	quicksort(0,4);
+        i = 0;
+    	while(i<5)
+        {
+            j = a[i];
+    		printf(" ",j);
+            i = i+1;
+        }
+    	printf("\n");
+    	return (0);
+    }
+    ```
+
+  * 编译结果
+
+    ```assembly
+    .data
+    a:	.space	20
+    $string0:	.asciiz	"Before sort: "
+    $string1:	.asciiz	" "
+    $string2:	.asciiz	"\nAfter  sort: "
+    $string3:	.asciiz	" "
+    $string4:	.asciiz	"\n"
+    .text
+    .globl main
+    		j	main
+    quicksort:
+    		subi	$sp	$sp	4
+    		move	$t0	$a0
+    		sw	$t0	-8($fp)
+    		subi	$sp	$sp	4
+    		move	$t0	$a1
+    		sw	$t0	-12($fp)
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	4
+    		lw	$t0	-8($fp)
+    		sw	$t0	-16($fp)
+    		lw	$t0	-12($fp)
+    		sw	$t0	-20($fp)
+    		lw	$t0	-8($fp)
+    		lw	$t1	-12($fp)
+    		add	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-32($fp)
+    		lw	$t0	-32($fp)
+    		li	$t1	2
+    		div	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-36($fp)
+    		la	$t0	a
+    		lw	$t1	-36($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-40($fp)
+    		lw	$t0	-40($fp)
+    		sw	$t0	-24($fp)
+    _LABLE_1:
+    		lw	$t0	-16($fp)
+    		lw	$t1	-20($fp)
+    		bgt	$t0	$t1	_LABLE_2
+    _LABLE_3:
+    		la	$t0	a
+    		lw	$t1	-20($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-44($fp)
+    		lw	$t0	-44($fp)
+    		lw	$t1	-24($fp)
+    		ble	$t0	$t1	_LABLE_4
+    		lw	$t0	-20($fp)
+    		li	$t1	1
+    		sub	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-48($fp)
+    		lw	$t0	-48($fp)
+    		sw	$t0	-20($fp)
+    		j	_LABLE_3
+    _LABLE_4:
+    _LABLE_5:
+    		la	$t0	a
+    		lw	$t1	-16($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-52($fp)
+    		lw	$t0	-52($fp)
+    		lw	$t1	-24($fp)
+    		bge	$t0	$t1	_LABLE_6
+    		lw	$t0	-16($fp)
+    		li	$t1	1
+    		add	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-56($fp)
+    		lw	$t0	-56($fp)
+    		sw	$t0	-16($fp)
+    		j	_LABLE_5
+    _LABLE_6:
+    		lw	$t0	-16($fp)
+    		lw	$t1	-20($fp)
+    		bgt	$t0	$t1	_LABLE_7
+    		la	$t0	a
+    		lw	$t1	-16($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-60($fp)
+    		lw	$t0	-60($fp)
+    		sw	$t0	-28($fp)
+    		la	$t0	a
+    		lw	$t1	-20($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-64($fp)
+    		lw	$t0	-64($fp)
+    		lw	$t1	-16($fp)
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		lw	$t0	-28($fp)
+    		lw	$t1	-20($fp)
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		lw	$t0	-16($fp)
+    		li	$t1	1
+    		add	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-68($fp)
+    		lw	$t0	-68($fp)
+    		sw	$t0	-16($fp)
+    		lw	$t0	-20($fp)
+    		li	$t1	1
+    		sub	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-72($fp)
+    		lw	$t0	-72($fp)
+    		sw	$t0	-20($fp)
+    		j	_LABLE_8
+    _LABLE_7:
+    _LABLE_8:
+    		j	_LABLE_1
+    _LABLE_2:
+    		lw	$t0	-16($fp)
+    		lw	$t1	-12($fp)
+    		bge	$t0	$t1	_LABLE_9
+    		lw	$a0	-16($fp)
+    		lw	$a1	-12($fp)
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	quicksort
+    		nop
+    		j	_LABLE_10
+    _LABLE_9:
+    _LABLE_10:
+    		lw	$t0	-20($fp)
+    		lw	$t1	-8($fp)
+    		ble	$t0	$t1	_LABLE_11
+    		lw	$a0	-8($fp)
+    		lw	$a1	-20($fp)
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	quicksort
+    		nop
+    		j	_LABLE_12
+    _LABLE_11:
+    _LABLE_12:
+    		move	$t0	$ra
+    		lw	$ra	-4($fp)
+    		add	$sp	$fp	$zero
+    		lw	$fp	($fp)
+    		jr	$t0
+    main:
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	8
+    		subi	$sp	$sp	4
+    		subi	$sp	$sp	4
+    		li	$t0	8
+    		li	$t1	0
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		li	$t0	9
+    		li	$t1	1
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		li	$t0	5
+    		li	$t1	2
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		li	$t0	7
+    		li	$t1	3
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		li	$t0	6
+    		li	$t1	4
+    		mul	$t1	$t1	-4
+    		la	$t2	a
+    		add	$t1	$t1	$t2
+    		sw	$t0	($t1)
+    		li	$t0	0
+    		sw	$t0	-16($fp)
+    		la	$t0	$string0
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    _LABLE_13:
+    		lw	$t0	-16($fp)
+    		li	$t1	5
+    		bge	$t0	$t1	_LABLE_14
+    		la	$t0	a
+    		lw	$t1	-16($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-24($fp)
+    		lw	$t0	-24($fp)
+    		sw	$t0	-20($fp)
+    		la	$t0	$string1
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		lw	$a0	-20($fp)
+    		li	$v0	1
+    		syscall
+    		lw	$t0	-16($fp)
+    		li	$t1	1
+    		add	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-28($fp)
+    		lw	$t0	-28($fp)
+    		sw	$t0	-16($fp)
+    		j	_LABLE_13
+    _LABLE_14:
+    		la	$t0	$string2
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		li	$a0	0
+    		li	$a1	4
+    		sw	$fp	($sp)
+    		add	$fp	$sp	$0
+    		subi	$sp	$sp	4
+    		sw	$ra	($sp)
+    		jal	quicksort
+    		nop
+    		li	$t0	0
+    		sw	$t0	-16($fp)
+    _LABLE_15:
+    		lw	$t0	-16($fp)
+    		li	$t1	5
+    		bge	$t0	$t1	_LABLE_16
+    		la	$t0	a
+    		lw	$t1	-16($fp)
+    		mul	$t1	$t1	-4
+    		add	$t0	$t0	$t1
+    		lw	$t0	($t0)
+    		subi	$sp	$sp	4
+    		sw	$t0	-32($fp)
+    		lw	$t0	-32($fp)
+    		sw	$t0	-20($fp)
+    		la	$t0	$string3
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		lw	$a0	-20($fp)
+    		li	$v0	1
+    		syscall
+    		lw	$t0	-16($fp)
+    		li	$t1	1
+    		add	$t0	$t0	$t1
+    		subi	$sp	$sp	4
+    		sw	$t0	-36($fp)
+    		lw	$t0	-36($fp)
+    		sw	$t0	-16($fp)
+    		j	_LABLE_15
+    _LABLE_16:
+    		la	$t0	$string4
+    		move	$a0	$t0
+    		li	$v0	4
+    		syscall
+    		li	$v0	10
+    		syscall
+    ```
+
+  * 运行结果（MARS）：
+
+    ```
+    
+    Before sort:  8 9 5 7 6
+    After  sort:  5 6 7 8 9
+    
+    -- program is finished running --
+    ```
+
+## 遇到的问题与解决方案
+
+* 编译缺失依赖文件（环境配置问题）
+
+  * 问题描述
+
+    由于使用的是轻量级开发环境VSCode，在配置好g++与gdb的路径后，启动调试，显示编译缺少依赖文件，无法进行编译
+
+  * 原因分析
+
+    配置文件中的launch.json主要用于启动GDB调试，启动调试之前需先编译，因此在launch.json中有一个preLaunchTask的配置项，对应在task.json中的一个任务，随后转去task.json，发现问题，该任务原始配置如下：
+
+    ```json
+    "args": [
+            "-g",
+            "${file}",
+            "-o",
+            "${fileDirname}\\${fileBasenameNoExtension}.exe",
+          ],
+    ```
+
+    但由于本程序include了其他的.cpp文件和.h文件，本来最好是只include头文件以免发生多重定义，但这里各个cpp之间基本没有交互，有交互的cpp之间也是include对方的头文件的，但main.cpp中最初是直接include源文件（cpp文件），因此出现这个问题，由于使用了未include的文件中的函数而编译时并没有包含该cpp文件，所以报错
+
+  * 解决方案
+
+    在配置项里增加缺失的cpp文件即可，这里只提示缺失了optimizer.cpp，因此修改如下：
+
+    ```json
+    "args": [
+            "-g",
+            "${file}",
+            "-o",
+            "${fileDirname}\\${fileBasenameNoExtension}.exe",
+            "${fileDirname}\\optimizer.cpp",
+          ],
+    ```
+
+    随后编译成功，调试运行正常
+
+* 值传递与引用传递（BUG调试）[生成四元式部分]
+
+  * 问题描述
+
+    在函数中对全局常量进行输出，在语法分析阶段报错，信息为：找不到变量的定义
+
+  * 原因分析
+
+    报错代码段为：
+
+    ```c++
+    int tempType = g_symbolTab.searchSymbol(opArg_printfBeta, 1, g);
+    cout << "variable " << opArg_printfBeta << " type: " << tempType;
+    if(tempType == 0)
+    {
+        genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "int");
+    }
+    else if(tempType == 1)
+    {
+        genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "char");
+    }
+    else{
+        if(g.g_const != 1){
+            error("Not find declaration of avarible array", g);
+        }
+        else{
+            genMidcode("prtf", opArg_printfAplha, opArg_printfBeta, "int");
+        }
+    }
+    ```
+
+    该代码段为语法分析中对printf的处理，其中的opArg_printfBeta为我们要输出的变量名字，该问题下为全局常量的名字，而后在符号表中进行查询，返回的是该变量的value，根据我的符号表的定义，全局常量的value为其常量值，若不是常量，则value为0代表int型变量，为1代表char型变量，经过调试发现得到的tempType确实为常量的值，因此进入else语句，再对全局控制变量g中的g_const进行判断，这个g_const为1时代表当前所查询的符号为常量，否则为变量，而g_const本身是属于全局控制变量g的，g在每次调用searchSymbol的时候会传入，查询时会根据符号是否是常量来改变g_const的值，也就是说这个g_const的值的改变是在调用searchSymbol的时候即时改变而生效，正常来说运行到这里g_const应该为1，但是却报错了，说明是g_const出了问题，因此跟进searchSymbol函数中：
+
+    ```c++
+    int symbolTable::searchSymbol(string name, int type, global_Var gn){
+        if(type == 2){
+            //search a name of function
+            for(int i = 0; i < i_totalProgram; i++){
+                if(vec_symbols[vec_programIndex[i]].s_name == name){
+                    if(vec_symbols[vec_programIndex[i]].i_para == gn.g_paranum){
+                        return 1;
+                    }
+                    else{
+                        return 0;
+                    }
+                }
+            }
+            return -1;
+        }
+        else{
+            //search a name of variable
+            for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
+                if(vec_symbols[i].s_name == name){
+                    return vec_symbols[i].i_value;
+                }
+            }
+            for(int i = 0; i < vec_programIndex[0]; i++){
+                if(vec_symbols[i].s_name == name){
+                    if(vec_symbols[i].i_type == 0){
+                        gn.g_const = 1;
+                    }
+                    else{
+                        gn.g_const = 0;
+                    }
+                    return vec_symbols[i].i_value;
+                }
+            }
+            return -2;
+        }
+    }
+    ```
+
+    由于不是查找函数名，因此直接进入else分支，经过调试发现gn.g_const = 1;这句代码居然被执行了，此时一下明白了是传参的问题，果然一看参数是值传递，因此这里的gn只是对全局控制变量g的一个拷贝，改变这个gn的值对g没有任何影响，所以返回后的g_const并不是1
+
+  * 解决方案
+
+    改值传递为引用传递即可
+
+    ```c++
+    int symbolTable::searchSymbol(string name, int type, global_Var& gn)
+    ```
+
+* 语句顺序（BUG调试）[语法分析部分]
+
+  * 问题描述
+
+    定义了两个分别带一个char类型的参数的函数，发现如果给的参数的名字一样的话在语法分析时报出“多重定义”的错误
+
+  * 原因分析
+
+    由变量的作用域可知，这两个同名的函数参数是没有道理触发多重定义的，那么最开始我以为是符号表部分变量的插入出了问题，调试了半天，最后发现这部分的逻辑代码是没有问题的，代码如下：
+
+    ```c++
+    void symbolTable::insert_symbol(string name, int type, int value, int address, int para, global_Var& gn){
+        if(type == 2){
+            //insert a name of function
+            for(int i = 0; i < i_totalProgram; i++){
+                if(vec_symbols[vec_programIndex[i]].s_name == name){
+                    error("Multiply defination of function", gn);
+                    return;
+                }
+            }
+            vec_programIndex.push_back(i_topIndex);
+            i_totalProgram++;
+            gn.g_paranum = 0;
+        }
+        else{
+            //insert a name of variable
+            if(i_totalProgram != 0){
+                for(int i = vec_programIndex[i_totalProgram-1]; i < i_topIndex; i++){
+                    if(vec_symbols[i].s_name == name){
+                        error("Multiply defination of variable", gn);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    // insert operation
+    ```
+
+    如上述代码可见，报出的错误位置是在第二个error函数处，但是根据我的符号表设计，首先语法分析到这是一个函数定义，那么就会先生成函数定义对应的四元式，这时候肯定会插入函数名，即调用这个函数其中type=2，因此当函数定义四元式生成后，i_totalprogram已经++了，这时候就已经出现了一个新的空间，即刚插入的那个函数的空间，此时这个空间是空的，没有任何变量存在，那么接下来语法分析就到了参数部分，在插入函数参数到符号表时，也会调用本函数进行插入，那么就说明这个变量在查找时对应的查找空间找到上一个函数的空间去了，因此我又仔细调试了一波，发现确实找的时候居然是上一个函数的空间，随后又赶紧检查了一下符号表的设计，却没有发现任何疑点，那么就只剩下一个可能了，在函数参数插入到符号表时，其对应的函数名压根就没插入符号表，导致新的函数空间没有生成，再查的时候就查到了上一个函数的空间里，导致了重名，一番调试后发现还真是函数名没有插入成功，最后一路回溯，到递归下降子程序对应位置，终于找到了原因：
+
+    ```c++
+    genMidcode("func", "char", "", opArg_funcName);
+    arg_List();
+    g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g.g_address, g.g_paranum, g);
+    ```
+
+    和这个递归下降子函数中的int类型返回值分支一比较，发现arg_List()的调用是在将函数名插入符号表生成其对应的函数空间之后的，可能是自己手误按到了Alt+down导致两句话顺序换了一下，结果就导致函数名在参数插入后再插入符号表中，但上面的int类型返回值函数的部分的顺序却是对的，调试了好久一直以为是符号表的问题，最后发现是一个小失误
+
+  * 解决方案
+
+    将顺序改为正确的顺序即可
+
+    ```c++
+    genMidcode("func", "char", "", opArg_funcName);
+    g_symbolTab.insert_symbol(opArg_funcName, 2, 2, g.g_address, g.g_paranum, g);
+    arg_List();
+    ```
+
+## 附录
+
+### 程序执行过程
+
+* 读入源程序 &rightarrow; 词法分析&rightarrow; 语法分析 &rightarrow; 生成四元式 &rightarrow; 常量传播优化四元式 &rightarrow; 翻译 &rightarrow; 汇编语句
+
+### 运行示例（带过程）
+
+* 源程序（为了覆盖所有点但又不至于太复杂）
+
+  ```c++
+  const int g = 5;
+  void main()
+  {
+      int a;
+      a = 1*(2+8/4)-g;
+      if(a < 0)
+      {
+          printf(a);
+      }
+      return (0);
+  }
+  ```
+
+* 我的编译器：启动！
+
+  * Step1：词法分析
+
+    结果如下：
+
+    ![1561970090898](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970090898.png)
+
+  * Step2：语法分析
+
+    结果如下：
+
+    ![1561970105021](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970105021.png)
+
+    符号表输出：
+
+    ![1561969924856](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561969924856.png)
+
+  * Step3：生成四元式
+
+    结果如下：
+
+    ![1561970136707](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970136707.png)
+
+  * Step4：常量传播优化
+
+    结果如下：
+
+    ![1561970148819](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970148819.png)
+
+    数据流块：
+
+    ![1561970195489](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970195489.png)
+
+  * Step5：汇编
+
+    结果如下：
+
+    ![1561970267588](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970267588.png)
+
+  * Step6：MARS仿真
+
+    结果如下：
+
+    ![1561970356529](C:\Users\HCY\AppData\Roaming\Typora\typora-user-images\1561970356529.png)
+
+## 结束
+
+* 通过本次编译原理试点班，我对编译器的认识从只知道在IDE里写好代码后按F5就完事儿到现在对编译器的整个工作流程有了一个清晰的认识，也掌握并实现了很多的方法，如递归下降子程序、数据流分析优化、符号表等，在开发整个项目的过程中，遇到了很多的问题、Bug，也有过苦恼、难受，但依然还是没有放弃，一步一步从词法分析开始到最后的优化，从一开始很困惑递归下降子程序到底最后的目的是要干什么到完成最初的那个表达式翻译的小任务，很多时候在一瞬间想明白了某一步甚至某一个模块要怎么运作，怎么配合其他模块，一下就豁然开朗了，但这并不代表这我就完全掌握了编译原理的所有内容，我曾经思考过一个问题，现在我写的这个编译器是使用的C++语言，要运行我这个编译器就得先用G++进行编译，但是G++本身也是一个编译器，经过查找资料，发现G++、GCC这些编译器也是用C语言写的，那么这些编译器的运行又是谁来负责编译呢，这仿佛陷入了一个死循环，最后经过一番google，原来第一个编译器是用汇编写出伪代码后再对照表转换为二进制指令来实现的，

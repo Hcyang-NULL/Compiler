@@ -28,7 +28,7 @@ int main(int argc,char *argv[]){
         file = argv[1];
     }
     else{
-        file = "C:\\Users\\HCY\\Desktop\\Compiler\\C0\\test.c";
+        file = ".\\Final-Version\\test.c";
     }
     cout << "Lex analysis result: " << endl;
     vector<pair<string, TYPE> > vec_tempFuncarg_1;
@@ -131,7 +131,7 @@ int main(int argc,char *argv[]){
     // }
     // opt::_exprOptimizer(vec_tempFuncarg_2);
     // system("pause");.
-    translate(vec_tempFuncarg_2);
+    translate(vec_tempFuncarg_4);
     system("pause");
     return 0;
 }

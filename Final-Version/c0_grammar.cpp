@@ -123,7 +123,7 @@ void symbolTable::insert_symbol(string name, int type, int value, int address, i
     symbol sym_temp;
     sym_temp.s_name = name;
     sym_temp.i_type = type;
-    cout << "test-type = " << type << endl;
+    // cout << "test-type = " << type << endl;
     sym_temp.i_value = value;
     sym_temp.i_address = address;
     sym_temp.i_para = para;
