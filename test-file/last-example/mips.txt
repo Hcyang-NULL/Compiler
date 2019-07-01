@@ -1,0 +1,33 @@
+.data
+g:	.word	5
+.text
+.globl main
+		j	main
+main:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		li	$t0	2
+		subi	$sp	$sp	4
+		sw	$t0	-12($fp)
+		li	$t0	4
+		subi	$sp	$sp	4
+		sw	$t0	-16($fp)
+		li	$t0	4
+		subi	$sp	$sp	4
+		sw	$t0	-20($fp)
+		li	$t0	-1
+		subi	$sp	$sp	4
+		sw	$t0	-24($fp)
+		li	$t0	-1
+		sw	$t0	-8($fp)
+		lw	$t0	-8($fp)
+		li	$t1	0
+		bge	$t0	$t1	_LABLE_1
+		lw	$a0	-8($fp)
+		li	$v0	1
+		syscall
+		j	_LABLE_2
+_LABLE_1:
+_LABLE_2:
+		li	$v0	10
+		syscall

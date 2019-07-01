@@ -1,7 +1,6 @@
 test.c
 test/
 buaa.cpp
-mips.txt
 /C0/*.exe
 !/C0/compiler.exe
 *.pdf

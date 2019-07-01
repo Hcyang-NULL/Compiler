@@ -1,0 +1,528 @@
+.data
+g_i1:	.word	10
+g_i2:	.word	5
+g_c1:	.word	97
+g_c2:	.word	65
+g_i3:	.space	4
+g_i4:	.space	4
+g_c3:	.space	4
+g_c4:	.space	4
+$string0:	.asciiz	"\n>> func1 test"
+$string1:	.asciiz	"\ng_i1 = "
+$string2:	.asciiz	"\ng_c2 = "
+$string3:	.asciiz	"\ng_i4 = "
+$string4:	.asciiz	"\ng_c3 = "
+$string5:	.asciiz	"\ng_i2 = "
+$string6:	.asciiz	"\ng_c1 = "
+$string7:	.asciiz	"\n>> func2 test"
+$string8:	.asciiz	"\ninput integer a:"
+$string9:	.asciiz	"confirm a: "
+$string10:	.asciiz	"\ninput character b:"
+$string11:	.asciiz	"confirm b: "
+$string12:	.asciiz	"\n>> func3 test"
+$string13:	.asciiz	"\nc = "
+$string14:	.asciiz	"\n>> func4 test"
+$string15:	.asciiz	"\np1 = 0"
+$string16:	.asciiz	"\np1 = 1"
+$string17:	.asciiz	"\np1 = 2"
+$string18:	.asciiz	"\np1 = "
+$string19:	.asciiz	"\n>> func5 test"
+$string20:	.asciiz	"\nc[1] = "
+$string21:	.asciiz	"\n>> func6 test"
+$string22:	.asciiz	"\n"
+$string23:	.asciiz	"Begin"
+$string24:	.asciiz	"\n<< func1 return"
+$string25:	.asciiz	"\n<< func2 return: "
+$string26:	.asciiz	"\n<< func3 return: "
+$string27:	.asciiz	"\n<< func4"
+$string28:	.asciiz	"\n<< func5 return: "
+$string29:	.asciiz	"\n<< func6 return: "
+$string30:	.asciiz	"\nEnd\n"
+.text
+.globl main
+		j	main
+func1:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		li	$t0	6
+		sw	$t0	-8($fp)
+		li	$t0	67
+		sw	$t0	-12($fp)
+		la	$t0	$string0
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	$string1
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	g_i1
+		lw	$a0	($t0)
+		li	$v0	1
+		syscall
+		la	$t0	$string2
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	g_c2
+		lw	$a0	($t0)
+		li	$v0	1
+		syscall
+		li	$t0	100
+		la	$t1	g_i4
+		sw	$t0	($t1)
+		li	$t0	72
+		la	$t1	g_c3
+		sw	$t0	($t1)
+		la	$t0	$string3
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	g_i4
+		lw	$a0	($t0)
+		li	$v0	1
+		syscall
+		la	$t0	$string4
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	g_c3
+		lw	$a0	($t0)
+		li	$v0	11
+		syscall
+		la	$t0	$string5
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-8($fp)
+		li	$v0	1
+		syscall
+		la	$t0	$string6
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-12($fp)
+		li	$v0	11
+		syscall
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+func2:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		la	$t0	$string7
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	$string8
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		li	$v0	5
+		syscall
+		sw	$v0	-8($fp)
+		la	$t0	$string9
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-8($fp)
+		li	$v0	1
+		syscall
+		la	$t0	$string10
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		li	$v0	5
+		syscall
+		sw	$v0	-12($fp)
+		la	$t0	$string11
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-12($fp)
+		li	$v0	11
+		syscall
+		li	$v1	0
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+func3:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		la	$t0	$string12
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		li	$t0	-1
+		subi	$sp	$sp	4
+		sw	$t0	-20($fp)
+		li	$t0	-4
+		subi	$sp	$sp	4
+		sw	$t0	-24($fp)
+		li	$t0	-3
+		subi	$sp	$sp	4
+		sw	$t0	-28($fp)
+		li	$t0	-3
+		sw	$t0	-8($fp)
+		li	$t0	2
+		subi	$sp	$sp	4
+		sw	$t0	-32($fp)
+		li	$t0	2
+		sw	$t0	-12($fp)
+		li	$t0	-1
+		subi	$sp	$sp	4
+		sw	$t0	-36($fp)
+		li	$t0	1
+		subi	$sp	$sp	4
+		sw	$t0	-40($fp)
+		li	$t0	1
+		sw	$t0	-16($fp)
+		la	$t0	$string13
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-16($fp)
+		li	$v0	1
+		syscall
+		li	$v1	75
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+func4:
+		subi	$sp	$sp	4
+		move	$t0	$a0
+		sw	$t0	-8($fp)
+		subi	$sp	$sp	4
+		la	$t0	$string14
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+_LABLE_1:
+		lw	$t0	-8($fp)
+		li	$t1	4
+		bge	$t0	$t1	_LABLE_2
+		lw	$t0	-8($fp)
+		li	$t1	0
+		bne	$t0	$t1	_LABLE_3
+		la	$t0	$string15
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		j	_LABLE_4
+_LABLE_3:
+		lw	$t0	-8($fp)
+		li	$t1	1
+		bne	$t0	$t1	_LABLE_5
+		la	$t0	$string16
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		j	_LABLE_6
+_LABLE_5:
+		lw	$t0	-8($fp)
+		li	$t1	2
+		bne	$t0	$t1	_LABLE_7
+		la	$t0	$string17
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		j	_LABLE_8
+_LABLE_7:
+		la	$t0	$string18
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-8($fp)
+		li	$v0	1
+		syscall
+_LABLE_8:
+_LABLE_6:
+_LABLE_4:
+		lw	$t0	-8($fp)
+		li	$t1	1
+		add	$t0	$t0	$t1
+		subi	$sp	$sp	4
+		sw	$t0	-12($fp)
+		lw	$t0	-12($fp)
+		sw	$t0	-8($fp)
+		j	_LABLE_1
+_LABLE_2:
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+func5:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		move	$t0	$a1
+		sw	$t0	-12($fp)
+		subi	$sp	$sp	4
+		subi	$sp	$sp	12
+		la	$t0	$string19
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		li	$t0	97
+		li	$t1	0
+		mul	$t1	$t1	-4
+		li	$t2	-16
+		add	$t1	$t2	$t1
+		add	$t1	$t1	$fp
+		sw	$t0	($t1)
+		li	$t0	103
+		li	$t1	1
+		mul	$t1	$t1	-4
+		li	$t2	-16
+		add	$t1	$t2	$t1
+		add	$t1	$t1	$fp
+		sw	$t0	($t1)
+		li	$t0	122
+		li	$t1	2
+		mul	$t1	$t1	-4
+		li	$t2	-16
+		add	$t1	$t2	$t1
+		add	$t1	$t1	$fp
+		sw	$t0	($t1)
+		li	$t0	-16
+		add	$t0	$t0	$fp
+		li	$t1	1
+		mul	$t1	$t1	-4
+		add	$t0	$t0	$t1
+		lw	$t0	($t0)
+		subi	$sp	$sp	4
+		sw	$t0	-28($fp)
+		lw	$t0	-28($fp)
+		la	$t1	g_c4
+		sw	$t0	($t1)
+		la	$t0	$string20
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		la	$t0	g_c4
+		lw	$a0	($t0)
+		li	$v0	11
+		syscall
+		li	$v1	0
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+func6:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	8
+		move	$t0	$a2
+		sw	$t0	-16($fp)
+		subi	$sp	$sp	4
+		move	$t0	$a3
+		sw	$t0	-20($fp)
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		subi	$sp	$sp	104
+		subi	$sp	$sp	4
+		la	$t0	$string21
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		li	$t0	97
+		sw	$t0	-132($fp)
+		li	$t0	0
+		sw	$t0	-24($fp)
+_LABLE_9:
+		lw	$t0	-24($fp)
+		li	$t1	26
+		bge	$t0	$t1	_LABLE_10
+		lw	$t0	-132($fp)
+		lw	$t1	-24($fp)
+		mul	$t1	$t1	-4
+		li	$t2	-28
+		add	$t1	$t2	$t1
+		add	$t1	$t1	$fp
+		sw	$t0	($t1)
+		lw	$t0	-132($fp)
+		li	$t1	1
+		add	$t0	$t0	$t1
+		subi	$sp	$sp	4
+		sw	$t0	-136($fp)
+		lw	$t0	-136($fp)
+		sw	$t0	-132($fp)
+		lw	$t0	-24($fp)
+		li	$t1	1
+		add	$t0	$t0	$t1
+		subi	$sp	$sp	4
+		sw	$t0	-140($fp)
+		lw	$t0	-140($fp)
+		sw	$t0	-24($fp)
+		j	_LABLE_9
+_LABLE_10:
+		li	$t0	0
+		sw	$t0	-24($fp)
+		la	$t0	$string22
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+_LABLE_11:
+		lw	$t0	-24($fp)
+		li	$t1	26
+		bge	$t0	$t1	_LABLE_12
+		li	$t0	-28
+		add	$t0	$t0	$fp
+		lw	$t1	-24($fp)
+		mul	$t1	$t1	-4
+		add	$t0	$t0	$t1
+		lw	$t0	($t0)
+		subi	$sp	$sp	4
+		sw	$t0	-144($fp)
+		lw	$t0	-144($fp)
+		sw	$t0	-132($fp)
+		lw	$a0	-132($fp)
+		li	$v0	11
+		syscall
+		lw	$t0	-24($fp)
+		li	$t1	1
+		add	$t0	$t0	$t1
+		subi	$sp	$sp	4
+		sw	$t0	-148($fp)
+		lw	$t0	-148($fp)
+		sw	$t0	-24($fp)
+		j	_LABLE_11
+_LABLE_12:
+		li	$v1	90
+		move	$t0	$ra
+		lw	$ra	-4($fp)
+		add	$sp	$fp	$zero
+		lw	$fp	($fp)
+		jr	$t0
+main:
+		subi	$sp	$sp	4
+		subi	$sp	$sp	16
+		subi	$sp	$sp	4
+		subi	$sp	$sp	4
+		la	$t0	$string23
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func1
+		nop
+		la	$t0	$string24
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func2
+		nop
+		subi	$sp	$sp	4
+		sw	$v1	-32($fp)
+		lw	$t0	-32($fp)
+		sw	$t0	-24($fp)
+		la	$t0	$string25
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-24($fp)
+		li	$v0	1
+		syscall
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func3
+		nop
+		subi	$sp	$sp	4
+		sw	$v1	-36($fp)
+		lw	$t0	-36($fp)
+		sw	$t0	-28($fp)
+		la	$t0	$string26
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-28($fp)
+		li	$v0	11
+		syscall
+		lw	$a0	-24($fp)
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func4
+		nop
+		la	$t0	$string27
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-28($fp)
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func5
+		nop
+		subi	$sp	$sp	4
+		sw	$v1	-40($fp)
+		lw	$t0	-40($fp)
+		sw	$t0	-24($fp)
+		li	$a0	99
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func5
+		nop
+		la	$t0	$string28
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-24($fp)
+		li	$v0	1
+		syscall
+		li	$a0	52
+		li	$a1	97
+		sw	$fp	($sp)
+		add	$fp	$sp	$0
+		subi	$sp	$sp	4
+		sw	$ra	($sp)
+		jal	func6
+		nop
+		subi	$sp	$sp	4
+		sw	$v1	-44($fp)
+		lw	$t0	-44($fp)
+		sw	$t0	-28($fp)
+		la	$t0	$string29
+		move	$a0	$t0
+		li	$v0	4
+		syscall
+		lw	$a0	-28($fp)
+		li	$v0	11
+		syscall
+		la	$t0	$string30
+		move	$a0	$t0
+		li	$v0	4
+		syscall
