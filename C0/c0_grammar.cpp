@@ -95,7 +95,7 @@ void symbolTable::symbol_test(){
     }
 }
 
-void symbolTable::insert_symbol(string name, int type, int value, int address, int para, global_Var gn){
+void symbolTable::insert_symbol(string name, int type, int value, int address, int para, global_Var& gn){
     if(type == 2){
         //insert a name of function
         for(int i = 0; i < i_totalProgram; i++){

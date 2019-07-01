@@ -73,7 +73,7 @@ int main(int argc,char *argv[]){
         }
         else
         {
-            if(now.s_operation == "func")
+            if(now.s_operation == "func" || now.s_operation == "para")
             {
                 vec_tempFuncarg_4.push_back(now);
                 fill = false;
@@ -123,9 +123,15 @@ int main(int argc,char *argv[]){
         midcode now = vec_tempFuncarg_2[i];
         std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
     }
+    cout << "----------------------------" << endl;
+    // for(int i = 0; i < vec_tempFuncarg_3.size(); i++)
+    // {
+    //     optMidcode now = vec_tempFuncarg_3[i];
+    //     std::cout << "< " << now.s_operation << ", " << now.s_alphaVar << ", " << now.s_betaVar << ", " << now.s_result << ">" << endl;
+    // }
     // opt::_exprOptimizer(vec_tempFuncarg_2);
     // system("pause");.
-    translate(vec_tempFuncarg_4);
+    translate(vec_tempFuncarg_2);
     system("pause");
     return 0;
 }

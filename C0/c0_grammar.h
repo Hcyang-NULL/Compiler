@@ -49,7 +49,7 @@ class symbolTable{
         vector<int> vec_programIndex;
 
         void symbol_test();
-        void insert_symbol(string name, int type, int value, int address, int para, global_Var gn);
+        void insert_symbol(string name, int type, int value, int address, int para, global_Var& gn);
         int searchSymbol(string name, int type, global_Var& gn);
 };
 
