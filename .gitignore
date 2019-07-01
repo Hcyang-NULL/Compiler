@@ -6,3 +6,5 @@ mips.txt
 !/C0/compiler.exe
 *.pdf
 /mxnet/
+*.ipch
+*.bin
